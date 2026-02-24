@@ -4068,7 +4068,7 @@ fullQuestionBank.push({
                 const isCorrect = (selectedOption === q.correct);
                 const correctLetter = letters[q.correct];
                 const correctText = q.options[q.correct];
-                resultIcon.innerHTML = isCorrect ? '<span class="correct-icon">✓ 答對了彤彤好棒</span>' : '<span class="wrong-icon">✗ 答錯了繼續加油</span>';
+                resultIcon.innerHTML = isCorrect ? '<span class="correct-icon">✓ 答對了彤彤好棒</span>' : '<span class="wrong-icon">✗ 答錯了繼續加油，但小飛歸我了</span>';
                 explanationText.innerText = q.explanation + ` 正確選項: ${correctLetter}. ${correctText}`;
                 feedbackArea.style.display = 'block';
             } else {
@@ -4140,4 +4140,5 @@ fullQuestionBank.push({
     })(); // IIFE 結束
     </script>
 </body>
+
 </html>
