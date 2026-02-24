@@ -1,0 +1,4143 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>護士考試·三百題隨機練習</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .card {
+            max-width: 780px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -10px rgba(0, 20, 30, 0.2);
+            padding: 32px 28px;
+            border: 1px solid rgba(170, 200, 220, 0.3);
+        }
+        .badge {
+            display: inline-block;
+            background: #e6f2ff;
+            color: #0066a0;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 30px;
+            letter-spacing: 0.3px;
+            margin-bottom: 20px;
+            border: 1px solid #b8d1e0;
+        }
+        .question-text {
+            font-size: 1.6rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: #0a2a3b;
+            margin-bottom: 28px;
+            word-break: break-word;
+        }
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 28px 0 20px;
+        }
+        .option-item {
+            background: #f9fcff;
+            border: 2px solid #dde7f0;
+            border-radius: 20px;
+            padding: 16px 22px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #104c6b;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .option-item:hover:not(.disabled-option) {
+            background: #e1f0fa;
+            border-color: #7ab3cc;
+            transform: translateY(-1px);
+        }
+        .option-item.selected {
+            background: #cce4f5;
+            border-color: #0f6b9c;
+            box-shadow: 0 4px 8px rgba(0,105,165,0.15);
+            color: #003c5c;
+        }
+        .option-item.disabled-option {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        .option-prefix {
+            font-weight: 700;
+            background: #cbdbe9;
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            margin-right: 20px;
+            color: #113946;
+            font-size: 1.2rem;
+            border: 1px solid #99b8cf;
+        }
+        .option-item.selected .option-prefix {
+            background: #0b6b9e;
+            color: white;
+            border-color: #0b6b9e;
+        }
+        .btn {
+            background: white;
+            border: none;
+            font-weight: 600;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.1s;
+            border: 2px solid transparent;
+        }
+        .btn-primary {
+            background: #0d5e86;
+            color: white;
+            box-shadow: 0 4px 10px rgba(13,94,134,0.3);
+            width: 100%;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: #0b4f72;
+            transform: scale(1.01);
+        }
+        .btn-primary:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .btn-outline {
+            background: white;
+            border-color: #a0c1d9;
+            color: #135b80;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-outline:hover {
+            background: #e6f0f8;
+            border-color: #5f9dc9;
+        }
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            gap: 15px;
+        }
+        .feedback-panel {
+            background: #f2f7fc;
+            border-radius: 24px;
+            padding: 22px 24px;
+            margin: 24px 0 16px;
+            border-left: 8px solid #2f86b3;
+            box-shadow: inset 0 0 0 1px #ffffff, 0 6px 12px rgba(0,40,60,0.08);
+        }
+        .result-badge {
+            font-size: 1.6rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .correct-icon {
+            color: #1b8c5e;
+        }
+        .wrong-icon {
+            color: #b13e3e;
+        }
+        .explanation {
+            font-size: 1.1rem;
+            color: #174b66;
+            background: #ffffffc7;
+            padding: 18px 20px;
+            border-radius: 20px;
+            line-height: 1.6;
+            border: 1px solid #bcd3e3;
+        }
+        .progress-note {
+            color: #597a95;
+            font-size: 1rem;
+            font-weight: 400;
+            margin-top: 12px;
+            text-align: right;
+        }
+        hr {
+            border: 1px solid #cbdde9;
+            margin: 20px 0 10px;
+        }
+        footer {
+            color: #7c9eb3;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: center;
+            margin-top: 12px;
+        }
+        .reminder {
+            background: #fcf9e7;
+            border-radius: 30px;
+            padding: 6px 18px;
+            font-size: 0.9rem;
+            color: #746b3a;
+            display: inline-block;
+            border: 1px solid #eedb9b;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="badge">🩺 護士考試 · 300題隨機練習</div>
+        <div class="question-text" id="questionText">載入題目中...</div>
+        <div id="optionsContainer" class="options-grid"></div>
+
+        <button class="btn btn-primary" id="submitBtn" disabled>✓ 確認答案</button>
+
+        <!-- 反饋區域（對錯+講解） -->
+        <div id="feedbackArea" style="display: none;" class="feedback-panel">
+            <div id="resultIcon" class="result-badge"></div>
+            <div id="explanationText" class="explanation"></div>
+        </div>
+
+        <div class="action-row">
+            <button class="btn btn-outline" id="nextBtn">⏩ 下一題 (隨機)</button>
+            <span class="reminder" id="historyTip"></span>
+        </div>
+        <hr>
+        <footer>📚 題庫500題 · 藥名中英葡對照 · 貼近真實執業考試</footer>
+    </div> <!-- .card 結束 -->
+
+    <script>
+    (function() {
+        // --------------------------------------------------------------
+        // 完整300題題庫（使用push逐題添加，確保可分段拼接）
+        // --------------------------------------------------------------
+        const fullQuestionBank = [];
+
+        // 題目1
+        fullQuestionBank.push({
+            question: "1. 護士給心衰竭病人使用「呋塞米」靜脈注射前，應優先評估哪一項？",
+            options: ["血鉀濃度 & 腎功能", "肝功能", "血糖", "淋巴計數"],
+            correct: 0,
+            explanation: "💊 Furosemide (呋塞米) ·  Lasix (芙洛) · 葡: Furosemida\n為高效能利尿劑，主要排鉀、排鈉，易致低血鉀及影響腎功能，尤其腎不全病人需調整劑量。使用前必查腎功能及電解質。"
+        });
+
+        // 題目2
+        fullQuestionBank.push({
+            question: "2. 下列哪種胰島素製劑外觀澄清，可靜脈注射？",
+            options: ["NPH (低精蛋白胰島素) · Insulina NPH", "常規胰島素 (Regular) · Insulina Simples", "甘精胰島素 (Glargine) · Insulina Glargina", "地特胰島素 (Detemir)"],
+            correct: 1,
+            explanation: "🔬 Regular insulin (胰島素) · 葡: Insulina regular  (亦稱 insulina simples) 是短效、澄清液體，可靜脈給藥。NPH、Glargine、Detemir 為混濁或長效，僅可皮下注射。"
+        });
+
+        // 題目3
+        fullQuestionBank.push({
+            question: "3. 化療藥物「多柔比星」滲出血管外，最可能引起什麼併發症？",
+            options: ["組織壞死", "發燒", "心律不整", "出血性膀胱炎"],
+            correct: 0,
+            explanation: "⚠️ Doxorubicin (多柔比星) · 葡: Doxorrubicina\n屬於蒽環類化療發泡劑，若滲漏會造成嚴重組織壞死與潰瘍。須立即停止注射、局部冷敷、專案處理。"
+        });
+
+        // 題目4
+        fullQuestionBank.push({
+            question: "4. 病人服用華法林 (Warfarin) 期間，護士應教導避免大量食用哪種食物？",
+            options: ["菠菜、西蘭花", "豬肉", "白米飯", "蘋果"],
+            correct: 0,
+            explanation: "🥬 Warfarin (華法林) · 葡: Varfarina\n為維生素K拮抗劑，綠色蔬菜富含維生素K，會減弱抗凝效果。需維持穩定攝取量並定期監測INR。"
+        });
+
+        // 題目5
+        fullQuestionBank.push({
+            question: "5. 下列哪種藥物常用於急救「過敏性休克」且是第一線用藥？",
+            options: ["Adrenaline (腎上腺素) · Adrenalina", "Atropine (阿托品)", "Dopamine (多巴胺)", "Hydrocortisone (氫化可的松)"],
+            correct: 0,
+            explanation: "🚑 Epinephrine (腎上腺素) · 葡: Adrenalina\n過敏性休克首選藥物，可迅速收縮血管、擴張支氣管。肌肉注射大題外側，成人劑量0.3-0.5mg。"
+        });
+
+        // 題目6
+        fullQuestionBank.push({
+            question: "6. 護士給予「硫酸鎂」靜脈滴注以預防子癇抽搐，最須監測的項目是？",
+            options: ["呼吸次數與膝反射", "血紅素", "體重", "尿糖"],
+            correct: 0,
+            explanation: "🧪 Magnesium sulfate (硫酸鎂) · 葡: Sulfato de magnésio\n過量會抑制中樞及呼吸，膝反射消失是早期中毒徵象。監測呼吸＞12次/分，尿量＞25ml/hr，且須有膝反射。"
+        });
+
+        // 題目7
+        fullQuestionBank.push({
+            question: "7. 病人使用「胺碘酮 (Amiodarone)」長期治療心律不整，應注意哪個器官的毒性？",
+            options: ["肺纖維化、甲狀腺功能", "腎臟", "骨髓", "皮膚"],
+            correct: 0,
+            explanation: " Amiodarone (胺碘酮) · 葡: Amiodarona\n高含碘，長期使用可導致甲狀腺機能亢進或低下、肺部浸潤/纖維化、角膜沉積。須定期監測肺功能、甲狀腺功能。"
+        });
+
+        // 題目8
+        fullQuestionBank.push({
+            question: "8. 下列哪種止痛藥因不影響血小板功能，常用於手術病人自控止痛？",
+            options: ["Ketorolac (酮咯酸)", "Morphine (嗎啡) · Morfina", "Ibuprofen (布洛芬)", "Aspirin (阿司匹林)"],
+            correct: 1,
+            explanation: "💉 Morphine (嗎啡) · 葡: Morfina\n屬於阿片類止痛藥，不影響血小板凝集，常用於術後PCA。NSAIDs (如ketorolac, ibuprofen, aspirin) 會抑制血小板功能。"
+        });
+
+        // 題目9
+        fullQuestionBank.push({
+            question: "9. 處方「Metformin」用於第二型糖尿病，護理指導最重要的一項？",
+            options: ["飯後服用並留意腎功能", "空腹服用效果更佳", "必須注射給藥", "不可與胰島素併用"],
+            correct: 0,
+            explanation: "💊 Metformin (二甲雙胍) · 葡: Metformina\n常見副作用腸胃不適，建議隨餐或飯後服用。主要經腎排泄，腎功能不全(eGFR<30)可能引發乳酸中毒。"
+        });
+
+        // 題目10
+        fullQuestionBank.push({
+            question: "10. 使用硝化甘油 (Nitroglycerin) 舌下含片，病人應採取何種姿勢？",
+            options: ["坐著或半坐臥", "平躺且頭部放低", "站立", "俯臥"],
+            correct: 0,
+            explanation: " Nitroglycerin (硝酸甘油) · 葡: Nitroglicerina\n舌下含服迅速吸收，可能引起眩暈、低血壓。建議坐著或半坐臥，避免站立昏倒。"
+        });
+        // 題目11
+        fullQuestionBank.push({
+            question: "11. 病人服用「Atorvastatin」類降血脂藥，應教導觀察哪種嚴重不良反應？",
+            options: ["肌肉酸痛、深色尿", "失眠", "口乾", "耳鳴"],
+            correct: 0,
+            explanation: " Atorvastatin (阿托伐他汀) · 葡: Atorvastatina\n他汀類可能引起肌肉病變、橫紋肌溶解症，症狀為無法解釋的肌肉疼痛、無力、茶色尿，應立即驗CK值。"
+        });
+
+        // 題目12
+        fullQuestionBank.push({
+            question: "12. 化療後病人出現口腔潰瘍，護理人員宜選用哪種溶液協助漱口？",
+            options: ["生理鹽水或碳酸氫鈉溶液", "酒精性漱口水", "雙氧水原液", "檸檬水"],
+            correct: 0,
+            explanation: "🧴 口腔護理: 生理鹽水 (Soro fisiológico) 或碳酸氫鈉溶液 (Bicarbonato de sódio) 可清潔、改變pH，防止黴菌滋生。避免酒精或刺激溶液。"
+        });
+
+        // 題目13
+        fullQuestionBank.push({
+            question: "13. 給予「靜脈輸注紅血球」前，必須與病人核對哪一項最重要？",
+            options: ["血型及交叉配血報告", "體溫", "病歷號碼", "病床號"],
+            correct: 0,
+            explanation: "🩸 輸血前雙人核對：血型 (ABO/Rh)、交叉配血報告、病人資料 (姓名、病歷號)。澳門衛生局指引嚴格遵行「病人安全目標」。"
+        });
+
+        // 題目14
+        fullQuestionBank.push({
+            question: "14. 使用「Heparin」持續靜脈滴注時，護士須監測哪項凝血指標？",
+            options: ["aPTT (部分凝血活酶時間)", "PT (凝血酶原時間)/INR", "血小板計數", "出血時間"],
+            correct: 0,
+            explanation: " Heparin (肝素) · 葡: Heparina\n主要監測 aPTT，維持於正常值的1.5-2.5倍。長時間使用須留意血小板減少(HIT)。"
+        });
+
+        // 題目15
+        fullQuestionBank.push({
+            question: "15. 下列哪項是澳門衛生局規定的護士核心才能之一？",
+            options: ["依法倫理執業及關懷溝通", "操作核磁共振", "處方藥物", "進行外科手術"],
+            correct: 0,
+            explanation: "📋 澳門護士執業核心包括：專業倫理、關懷溝通、臨床照護、法律責任等。 護士不可處方藥物或手術。"
+        });
+
+        // 題目16
+        fullQuestionBank.push({
+            question: "16. 測量血壓時，袖帶下緣應位於肘窩上方多高？",
+            options: ["1-2cm", "2.5-4cm", "5-6cm", "7-8cm"],
+            correct: 1,
+            explanation: "袖帶下緣應在肘窩上方2.5-4cm（約兩橫指），鬆緊以插入一指為宜。"
+        });
+
+        // 題目17
+        fullQuestionBank.push({
+            question: "17. 執行無菌操作時，下列哪項行為錯誤？",
+            options: ["口罩遮住口鼻", "手術衣前面視為無菌", "無菌手套破損立即更換", "無菌容器打開後蓋子內面朝上放於桌面"],
+            correct: 3,
+            explanation: "無菌容器打開後，蓋子內面應朝上，但不可隨意放置於桌面，應手持或置於無菌區域。"
+        });
+
+        // 題目18
+        fullQuestionBank.push({
+            question: "18. 下列哪種溶液不能用於輸血前後沖洗輸血管道？",
+            options: ["生理鹽水", "5%葡萄糖", "林格氏液", "以上皆是"],
+            correct: 3,
+            explanation: "輸血前後只能用生理鹽水沖管，葡萄糖或林格氏液可能引起溶血或凝血。"
+        });
+
+        // 題目19
+        fullQuestionBank.push({
+            question: "19. 測量中心靜脈壓(CVP)時，零點應對準哪個位置？",
+            options: ["腋中線與第四肋間交點", "鎖骨中線與第二肋間", "胸骨角", "劍突下"],
+            correct: 0,
+            explanation: "CVP測量零點為右心房水平，即腋中線與第四肋間交點（相當於右心房中點）。"
+        });
+
+        // 題目20
+        fullQuestionBank.push({
+            question: "20. 協助病人從床上移至輪椅，下列哪項不正確？",
+            options: ["輪椅與床尾呈45度角", "固定輪椅剎車", "病人腳踏在輪椅腳踏板後再轉身", "護士用雙腿固定病人膝部"],
+            correct: 2,
+            explanation: "病人應先轉身坐入輪椅，再將腳放上踏板，避免站立時踏板不穩。"
+        });
+
+        // 題目21
+        fullQuestionBank.push({
+            question: "21. 使用熱水袋為病人保暖，水溫一般不宜超過多少度？",
+            options: ["40℃", "50℃", "60℃", "70℃"],
+            correct: 1,
+            explanation: "熱水袋水溫成人50℃，意識不清或循環障礙者應低於50℃，並用布包裹。"
+        });
+
+        // 題目22
+        fullQuestionBank.push({
+            question: "22. 下列哪項不是壓瘡發生的危險因素？",
+            options: ["長期臥床", "營養不良", "皮膚潮濕", "高血壓"],
+            correct: 3,
+            explanation: "高血壓並非直接壓瘡危險因素，而剪切力、壓力、潮濕、營養差才是主因。"
+        });
+
+        // 題目23
+        fullQuestionBank.push({
+            question: "23. 鼻飼飲食時，注入流質前應先做什麼？",
+            options: ["加熱至40℃", "確認胃管在胃內", "抽吸胃殘餘量", "抬高床頭30度"],
+            correct: 1,
+            explanation: "必須先確認胃管位置（抽胃液、聽氣過水聲、pH試紙），再進行後續操作。"
+        });
+
+        // 題目24
+        fullQuestionBank.push({
+            question: "24. 執行導尿術時，消毒陰部順序應為？",
+            options: ["由外往內，由上往下", "由內往外，由上往下", "由外往內，由下往上", "由內往外，由下往上"],
+            correct: 0,
+            explanation: "女性導尿消毒原則是從外到內、從上到下（陰阜→大陰唇→小陰唇→尿道口）。"
+        });
+
+        // 題目25
+        fullQuestionBank.push({
+            question: "25. 肝硬化病人出現撲翼樣震顫，提示可能發生？",
+            options: ["肝性腦病變", "消化道出血", "肝腎綜合徵", "自發性腹膜炎"],
+            correct: 0,
+            explanation: "撲翼樣震顫是肝性腦病變的典型神經系統徵象，與血氨升高有關。"
+        });
+
+        // 題目26
+        fullQuestionBank.push({
+            question: "26. 使用毛地黃（Digoxin·葡: Digoxina）的病人，下列哪項不是中毒表現？",
+            options: ["噁心嘔吐", "黃視綠視", "心率加快", "心律不整"],
+            correct: 2,
+            explanation: "毛地黃中毒可引起心臟毒性（心律不整、心率減慢）、消化道症狀及視覺異常，不會使心率加快（通常減慢）。"
+        });
+
+        // 題目27
+        fullQuestionBank.push({
+            question: "27. 支氣管哮喘急性發作時，首選藥物為？",
+            options: ["口服長效β2激動劑", "吸入短效β2激動劑", "靜脈注射氨茶鹼", "吸入糖皮質激素"],
+            correct: 1,
+            explanation: "急性發作首選短效β2激動劑（如沙丁胺醇·葡: Salbutamol），快速鬆弛支氣管平滑肌。"
+        });
+
+        // 題目28
+        fullQuestionBank.push({
+            question: "28. 胰島素注射時，為避免脂肪增生，應如何輪換部位？",
+            options: ["同一區域內固定點", "左右對稱輪換，每次間距至少1cm", "只在大腿外側注射", "避開腹部以免吸收過快"],
+            correct: 1,
+            explanation: "胰島素注射應左右對稱輪換，每次注射點間距至少1cm，避免短期內同一點重複注射。"
+        });
+
+        // 題目29
+        fullQuestionBank.push({
+            question: "29. 下列哪項是心絞痛典型胸痛特點？",
+            options: ["尖銳針刺樣，與勞累無關", "胸骨後壓榨感，勞累誘發，休息或硝酸甘油緩解", "持續劇痛伴呼吸困難", "向左肩放射，含服硝酸甘油無效"],
+            correct: 1,
+            explanation: "心絞痛典型表現為胸骨後壓榨性疼痛，勞累誘發，休息或含服硝酸甘油（Nitroglycerin·葡: Nitroglicerina）後3-5分鐘緩解。"
+        });
+
+        // 題目30
+        fullQuestionBank.push({
+            question: "30. 慢性腎衰竭病人出現高血鉀，緊急處理不包括？",
+            options: ["靜脈注射葡萄糖酸鈣", "靜脈注射胰島素+葡萄糖", "口服降鉀樹脂", "快速輸注生理鹽水"],
+            correct: 3,
+            explanation: "高血鉀處理包括鈣劑（穩定心肌）、胰島素+葡萄糖（促鉀入細胞）、降鉀樹脂（促排洩），快速輸鹽水反而可能稀釋血鉀但非首選，且可能加重水腫。"
+        });
+
+        // 題目31
+        fullQuestionBank.push({
+            question: "31. 子癇病人使用硫酸鎂（Magnesium sulfate·葡: Sulfato de magnésio）治療，中毒時首選解毒劑為？",
+            options: ["葡萄糖酸鈣", "納洛酮", "阿托品", "碳酸氫鈉"],
+            correct: 0,
+            explanation: "硫酸鎂過量抑制呼吸和神經，鈣離子可拮抗鎂離子作用，靜脈注射10%葡萄糖酸鈣。"
+        });
+
+        // 題目32
+        fullQuestionBank.push({
+            question: "32. 產後出血最常見的原因為？",
+            options: ["子宮收縮乏力", "胎盤殘留", "軟產道損傷", "凝血功能障礙"],
+            correct: 0,
+            explanation: "產後出血四大原因：子宮收縮乏力（最常見）、胎盤因素、產道損傷、凝血功能障礙。"
+        });
+
+        // 題目33
+        fullQuestionBank.push({
+            question: "33. 妊娠期糖尿病病人，產後胰島素用量一般如何調整？",
+            options: ["維持原量", "減量甚至停用", "加倍", "改為口服藥"],
+            correct: 1,
+            explanation: "胎盤娩出後抗胰島素激素迅速下降，胰島素需求量明顯減少，應及時減量，多數可停用。"
+        });
+
+        // 題目34
+        fullQuestionBank.push({
+            question: "34. 下列哪項不是胎盤早剝的典型表現？",
+            options: ["陰道流血伴腹痛", "子宮板樣硬", "胎心減慢", "胎位清楚"],
+            correct: 3,
+            explanation: "胎盤早剝時子宮內出血，可致子宮張力增高、壓痛、胎位觸診不清。"
+        });
+
+        // 題目35
+        fullQuestionBank.push({
+            question: "35. 早產兒易發生新生兒呼吸窘迫症候群，與缺乏何種物質有關？",
+            options: ["肺泡表面活性物質", "免疫球蛋白", "膽紅素", "糖原"],
+            correct: 0,
+            explanation: "肺泡表面活性物質（主要由Ⅱ型肺泡細胞分泌）缺乏導致肺泡塌陷，引起呼吸窘迫。"
+        });
+
+        // 題目36
+        fullQuestionBank.push({
+            question: "36. 使用催產素（Oxytocin·葡: Ocitocina）引產時，下列哪項護理不當？",
+            options: ["從小劑量開始", "專人監護宮縮及胎心", "出現強直宮縮立即停藥", "可同時使用麥角新鹼加強宮縮"],
+            correct: 3,
+            explanation: "麥角新鹼可引起子宮強直性收縮，不能用於引產或第一、二產程，僅用於產後出血。"
+        });
+
+        // 題目37
+        fullQuestionBank.push({
+            question: "37. 子宮頸抹片檢查（Pap smear）的目的是篩檢？",
+            options: ["子宮頸癌", "卵巢癌", "子宮內膜癌", "陰道癌"],
+            correct: 0,
+            explanation: "子宮頸抹片主要篩檢子宮頸癌前病變及早期子宮頸癌。"
+        });
+
+        // 題目38
+        fullQuestionBank.push({
+            question: "38. 自然產後，會陰傷口護理下列哪項正確？",
+            options: ["每天用碘伏消毒兩次", "大便後由前向後擦拭", "使用衛生棉條吸收惡露", "立即盆浴促進血液循環"],
+            correct: 1,
+            explanation: "大便後應由前向後擦拭，避免污染會陰傷口。傷口保持乾燥，可用稀碘伏消毒，但不可盆浴。"
+        });
+
+        // 題目39
+        fullQuestionBank.push({
+            question: "39. 哺乳期乳腺炎最常見的致病菌為？",
+            options: ["金黃色葡萄球菌", "大腸桿菌", "鏈球菌", "厭氧菌"],
+            correct: 0,
+            explanation: "金黃色葡萄球菌經乳頭破損或乳管開口逆行感染引起急性乳腺炎。"
+        });
+
+        // 題目40
+        fullQuestionBank.push({
+            question: "40. 產後憂鬱症通常發生在產後？",
+            options: ["1週內", "2週內", "4週內", "6個月內"],
+            correct: 2,
+            explanation: "產後憂鬱症多在產後2-4週內出現，持續數週至數月。"
+        });
+
+        // 題目41
+        fullQuestionBank.push({
+            question: "41. 嬰兒口服脊髓灰質炎疫苗（OPV）的注意事項，下列哪項錯誤？",
+            options: ["冷開水送服", "服用前後半小時避免餵奶", "吐出的疫苗應補服", "發熱時也可服用"],
+            correct: 3,
+            explanation: "發熱、腹瀉、免疫缺陷時應暫緩服用OPV，以免發生疫苗相關麻痺。"
+        });
+
+        // 題目42
+        fullQuestionBank.push({
+            question: "42. 小兒肺炎合併心衰的表現，不包括？",
+            options: ["呼吸突然加快＞60次/分", "心率突然增快＞180次/分", "肝臟迅速增大", "血壓升高"],
+            correct: 3,
+            explanation: "心衰表現：呼吸心率加快、肝大、發紺、尿少、心音低鈍，血壓一般下降而非升高。"
+        });
+
+        // 題目43
+        fullQuestionBank.push({
+            question: "43. 新生兒黃疸進行光照治療時，應如何保護眼睛？",
+            options: ["用黑眼罩遮蓋", "不需遮蓋", "用紗布覆蓋", "讓嬰兒閉眼即可"],
+            correct: 0,
+            explanation: "光照療法（藍光）需用專用眼罩保護視網膜，同時遮蓋會陰部保護生殖器。"
+        });
+
+        // 題目44
+        fullQuestionBank.push({
+            question: "44. 小兒腹瀉伴輕度脫水，首選口服補液鹽（ORS），其張力為？",
+            options: ["等張", "2/3張", "1/2張", "1/3張"],
+            correct: 1,
+            explanation: "口服補液鹽（ORS）為2/3張，含鈉、鉀、氯、枸櫞酸鹽、葡萄糖，用於糾正輕中度脫水。"
+        });
+
+        // 題目45
+        fullQuestionBank.push({
+            question: "45. 麻疹患兒出疹順序為？",
+            options: ["耳後髮際→面頸→軀幹→四肢", "四肢→軀幹→頭面", "軀幹→四肢→頭面", "手心腳底→軀幹"],
+            correct: 0,
+            explanation: "麻疹皮疹先出現於耳後、髮際、面部，然後蔓延至軀幹、四肢，最後達手心腳底。"
+        });
+
+        // 題目46
+        fullQuestionBank.push({
+            question: "46. 小兒支氣管異物最常見的體徵是？",
+            options: ["持續發熱", "呼吸困難伴喘鳴", "咳鐵鏽色痰", "哮鳴音固定於一側"],
+            correct: 3,
+            explanation: "異物阻塞一側支氣管可導致該側呼吸音減弱、固定性哮鳴音，吸氣性三凹徵。"
+        });
+
+        // 題目47
+        fullQuestionBank.push({
+            question: "47. 新生兒窒息的復甦程序（A、B、C、D、E）中，第一步是？",
+            options: ["清理呼吸道", "建立呼吸", "維持循環", "藥物治療"],
+            correct: 0,
+            explanation: "新生兒復甦按A（清理呼吸道）、B（建立呼吸）、C（維持循環）、D（給藥）、E（評估）進行。"
+        });
+
+        // 題目48
+        fullQuestionBank.push({
+            question: "48. 苯丙酮尿症患兒應限制哪種胺基酸攝入？",
+            options: ["苯丙氨酸", "酪氨酸", "色氨酸", "賴氨酸"],
+            correct: 0,
+            explanation: "苯丙酮尿症因苯丙氨酸羥化酶缺乏，需限制苯丙氨酸攝入，食用特殊配方奶粉。"
+        });
+
+        // 題目49
+        fullQuestionBank.push({
+            question: "49. 川崎病的診斷標準不包括？",
+            options: ["發熱≥5天", "雙眼結膜充血", "頸部淋巴結腫大", "關節疼痛"],
+            correct: 3,
+            explanation: "川崎病主要表現：發熱、雙側結膜充血、口唇改變、多形性皮疹、肢端變化、頸部淋巴結腫大。關節痛可出現但非診斷必需。"
+        });
+
+        // 題目50
+        fullQuestionBank.push({
+            question: "50. 小兒用藥劑量計算最常用的方法？",
+            options: ["按體重計算", "按年齡折算", "按體表面積", "按成人劑量減半"],
+            correct: 0,
+            explanation: "臨床最常用按體重計算（mg/kg），準確且方便；體表面積更精確但複雜。"
+        });
+
+        // 題目51
+        fullQuestionBank.push({
+            question: "51. 下列哪種藥物屬於青黴素類抗生素，用前需做皮試？",
+            options: ["頭孢唑林（Cefazolin）", "阿奇黴素（Azithromycin）", "阿莫西林（Amoxicillin）", "左氧氟沙星（Levofloxacin）"],
+            correct: 2,
+            explanation: "阿莫西林（Amoxicillin·葡: Amoxicilina）屬青黴素類，與青黴素存在交叉過敏，需皮試。頭孢類雖需皮試但屬頭孢菌素類。"
+        });
+
+        // 題目52
+        fullQuestionBank.push({
+            question: "52. 使用氨基糖苷類藥物（如慶大黴素）應特別監測？",
+            options: ["肝功能和血壓", "腎功能和聽力", "血糖和電解質", "凝血功能"],
+            correct: 1,
+            explanation: "慶大黴素（Gentamicin·葡: Gentamicina）具腎毒性及耳毒性，用藥期間監測尿量、血肌酐及聽力。"
+        });
+
+        // 題目53
+        fullQuestionBank.push({
+            question: "53. 下列哪種降壓藥可能引起乾咳的副作用？",
+            options: ["硝苯地平（Nifedipine）", "依那普利（Enalapril）", "氫氯噻嗪（Hydrochlorothiazide）", "美托洛爾（Metoprolol）"],
+            correct: 1,
+            explanation: "血管收縮素轉化酶抑制劑（ACEI）如依那普利（Enalapril·葡: Enalapril）常見乾咳，因緩激肽積聚。"
+        });
+
+        // 題目54
+        fullQuestionBank.push({
+            question: "54. 阿托品（Atropine·葡: Atropina）的藥理作用不包括？",
+            options: ["解除平滑肌痙攣", "抑制腺體分泌", "散瞳、升高眼壓", "降低心率"],
+            correct: 3,
+            explanation: "阿托品為M膽鹼受體阻斷劑，可解除平滑肌痙攣、抑制腺體分泌、散瞳、加快心率（而非降低），用於有機磷中毒、術前給藥。"
+        });
+
+        // 題目55
+        fullQuestionBank.push({
+            question: "55. 下列哪種藥物為長效胰島素類似物？",
+            options: ["賴脯胰島素（Lispro）", "門冬胰島素（Aspart）", "甘精胰島素（Glargine·葡: Glargina）", "常規胰島素（Regular）"],
+            correct: 2,
+            explanation: "甘精胰島素（Glargine）為長效，無峰值，作用持續24小時；Lispro、Aspart為速效；Regular為短效。"
+        });
+
+        // 題目56
+        fullQuestionBank.push({
+            question: "56. 化療藥物環磷酰胺（Cyclophosphamide·葡: Ciclofosfamida）最需預防的副作用是？",
+            options: ["出血性膀胱炎", "心臟毒性", "肺纖維化", "周圍神經炎"],
+            correct: 0,
+            explanation: "環磷酰胺代謝產物丙烯醛可刺激膀胱黏膜，引起出血性膀胱炎，需多飲水、美司鈉解救。"
+        });
+
+        // 題目57
+        fullQuestionBank.push({
+            question: "57. 下列哪種藥物不能用於青光眼患者？",
+            options: ["毛果芸香鹼（Pilocarpine）", "噻嗎洛爾（Timolol）", "阿托品（Atropine）", "拉坦前列素（Latanoprost）"],
+            correct: 2,
+            explanation: "阿托品（Atropina）可擴瞳、升高眼壓，誘發或加重青光眼，禁用於窄角型青光眼。"
+        });
+
+        // 題目58
+        fullQuestionBank.push({
+            question: "58. 碳酸鋰（Lithium carbonate·葡: Carbonato de lítio）用於躁狂症，治療濃度和中毒濃度接近，需監測？",
+            options: ["血藥濃度", "肝功能", "腎功能", "甲狀腺功能"],
+            correct: 0,
+            explanation: "鋰鹽治療窗窄（0.6-1.2mmol/L），超過1.5mmol/L易中毒，需定期監測血藥濃度。"
+        });
+
+        // 題目59
+        fullQuestionBank.push({
+            question: "59. 使用多巴胺（Dopamine·葡: Dopamina）靜脈滴注時，劑量過大主要引起？",
+            options: ["血壓下降", "心率減慢", "腎血管擴張", "心律失常"],
+            correct: 3,
+            explanation: "多巴胺劑量過大（＞10μg/kg/min）興奮α受體，血管收縮，並可致快速性心律失常。"
+        });
+
+        // 題目60
+        fullQuestionBank.push({
+            question: "60. 下列哪種藥物是鈣通道阻滯劑，用於治療高血壓？",
+            options: ["卡託普利（Captopril）", "硝苯地平（Nifedipine·葡: Nifedipina）", "氯沙坦（Losartan）", "氫氯噻嗪（Hydrochlorothiazide）"],
+            correct: 1,
+            explanation: "硝苯地平（Nifedipina）為二氫吡啶類鈣通道阻滯劑，擴張血管降壓。"
+        });
+
+        // 題目61
+        fullQuestionBank.push({
+            question: "61. 急救時，成人單人心肺復甦按壓與通氣比例為？",
+            options: ["15:2", "30:2", "30:1", "15:1"],
+            correct: 1,
+            explanation: "成人單人或雙人CPR按壓通氣比均為30:2，直至氣道進階置入。"
+        });
+
+        // 題目62
+        fullQuestionBank.push({
+            question: "62. 有機磷農藥中毒，解毒劑首選？",
+            options: ["阿托品+碘解磷定", "納洛酮", "氟馬西尼", "維生素K1"],
+            correct: 0,
+            explanation: "有機磷中毒使用阿托品（拮抗乙醯膽鹼）和碘解磷定（復活膽鹼酯酶）。"
+        });
+
+        // 題目63
+        fullQuestionBank.push({
+            question: "63. 高鉀血症引起心臟驟停，緊急注射何種藥物最有效？",
+            options: ["葡萄糖酸鈣", "碳酸氫鈉", "胰島素+葡萄糖", "呋塞米"],
+            correct: 0,
+            explanation: "鈣劑可迅速對抗高鉀對心肌的抑制，穩定心肌細胞膜，是急救首選。"
+        });
+
+        // 題目64
+        fullQuestionBank.push({
+            question: "64. 急性心肌梗死患者出現室顫，應立即？",
+            options: ["電擊除顫", "靜脈注射利多卡因", "胸外按壓", "呼叫急救"],
+            correct: 0,
+            explanation: "室顫最有效治療是立即非同步電除顫，越早除顫成功率越高。"
+        });
+
+        // 題目65
+        fullQuestionBank.push({
+            question: "65. 創傷性休克病人首要處理措施為？",
+            options: ["控制出血", "補充血容量", "鎮痛", "固定骨折"],
+            correct: 0,
+            explanation: "創傷休克首要控制活動性出血（壓迫、止血帶），其次才是補液等其他措施。"
+        });
+
+        // 題目66
+        fullQuestionBank.push({
+            question: "66. 下列哪項是呼吸機高壓報警的常見原因？",
+            options: ["氣管導管氣囊漏氣", "呼吸機管道脫落", "病人嗆咳或痰液阻塞", "氧濃度過低"],
+            correct: 2,
+            explanation: "高壓報警多因氣道阻力增加（痰堵、嗆咳、氣管痙攣）或管道扭曲。"
+        });
+
+        // 題目67
+        fullQuestionBank.push({
+            question: "67. 一氧化碳中毒最有效的給氧方式為？",
+            options: ["鼻導管給氧", "面罩給氧", "高壓氧治療", "呼吸機純氧"],
+            correct: 2,
+            explanation: "高壓氧可快速將碳氧血紅蛋白解離，糾正組織缺氧，減少遲發性腦病。"
+        });
+
+        // 題目68
+        fullQuestionBank.push({
+            question: "68. 顱內高壓患者，避免下列哪項操作？",
+            options: ["抬高床頭15-30度", "保持大便通暢", "劇烈咳嗽", "限制液體入量"],
+            correct: 2,
+            explanation: "劇烈咳嗽、用力排便可使顱內壓驟升，應避免並予藥物預防。"
+        });
+
+        // 題目69
+        fullQuestionBank.push({
+            question: "69. 失血性休克補液首選？",
+            options: ["全血", "平衡鹽溶液（林格氏液）", "5%葡萄糖", "羥乙基澱粉"],
+            correct: 1,
+            explanation: "失血性休克早期先快速輸注平衡鹽溶液（晶體液），然後根據情況輸血。"
+        });
+
+        // 題目70
+        fullQuestionBank.push({
+            question: "70. 過敏性休克首選藥物為？",
+            options: ["腎上腺素（Adrenaline）", "異丙嗪（Promethazine）", "地塞米松（Dexamethasone）", "多巴胺（Dopamine）"],
+            correct: 0,
+            explanation: "腎上腺素（Adrenalina）可收縮血管、擴張支氣管、抑制過敏介質釋放，是過敏性休克一線用藥。"
+        });
+
+        // 題目71
+        fullQuestionBank.push({
+            question: "71. 氟西汀（Fluoxetine·葡: Fluoxetina）屬於哪類抗抑鬱藥？",
+            options: ["三環類", "SSRI（選擇性5-羥色胺再攝取抑制劑）", "MAOI（單胺氧化酶抑制劑）", "SNRI"],
+            correct: 1,
+            explanation: "氟西汀（Fluoxetina）是SSRI類抗抑鬱藥，副作用較三環類少。"
+        });
+
+        // 題目72
+        fullQuestionBank.push({
+            question: "72. 精神分裂症患者出現木僵狀態，護理時應注意？",
+            options: ["強迫進食", "加強刺激促使其活動", "預防壓瘡和營養不良", "不予理睬"],
+            correct: 2,
+            explanation: "木僵患者長期不動，需基礎護理（翻身、口腔、營養），避免併發症。"
+        });
+
+        // 題目73
+        fullQuestionBank.push({
+            question: "73. 氯氮平（Clozapine·葡: Clozapina）最需監測的嚴重不良反應？",
+            options: ["粒細胞缺乏症", "肝功能損害", "體重增加", "心電圖QT延長"],
+            correct: 0,
+            explanation: "氯氮平可致粒細胞缺乏，用藥期間需定期監測血常規，尤其前6個月。"
+        });
+
+        // 題目74
+        fullQuestionBank.push({
+            question: "74. 躁狂症患者急性期，護理環境應？",
+            options: ["色彩鮮艷、熱鬧", "安靜、簡單、避免刺激", "嚴格限制活動", "多人同室互相約束"],
+            correct: 1,
+            explanation: "躁狂患者需減少環境刺激，保持安靜，防止過度興奮。"
+        });
+
+        // 題目75
+        fullQuestionBank.push({
+            question: "75. 下列哪種藥物用於治療雙相情感障礙的心境穩定劑？",
+            options: ["丙戊酸鈉（Sodium valproate）", "唑吡坦（Zolpidem）", "利培酮（Risperidone）", "舍曲林（Sertraline）"],
+            correct: 0,
+            explanation: "心境穩定劑包括鋰鹽、丙戊酸鈉（Valproato de sódio）、卡馬西平等，用於預防躁狂和抑鬱發作。"
+        });
+
+        // 題目76
+        fullQuestionBank.push({
+            question: "76. 強迫症患者反覆洗手，護士應？",
+            options: ["強制阻止", "安排其他活動轉移注意力", "斥責其浪費水", "鼓勵其完成後給予放鬆"],
+            correct: 1,
+            explanation: "行為治療可採用轉移注意力、延遲儀式行為，但不應強制或斥責。"
+        });
+
+        // 題目77
+        fullQuestionBank.push({
+            question: "77. 使用抗精神病藥物後出現急性肌張力障礙，應注射？",
+            options: ["地西泮", "苯海索（安坦）或東莨菪鹼", "氟哌啶醇", "氯硝西泮"],
+            correct: 1,
+            explanation: "急性肌張力障礙為錐體外系反應，可用抗膽鹼藥（苯海索、東莨菪鹼）緩解。"
+        });
+
+        // 題目78
+        fullQuestionBank.push({
+            question: "78. 酒精戒斷綜合徵最嚴重的表現為？",
+            options: ["震顫", "幻覺", "抽搐", "震顫譫妄"],
+            correct: 3,
+            explanation: "震顫譫妄（delirium tremens）可出現意識模糊、幻覺、高熱、自主神經亢進，死亡率高。"
+        });
+
+        // 題目79
+        fullQuestionBank.push({
+            question: "79. 電抽搐治療（ECT）前，必須準備哪種藥物？",
+            options: ["阿托品", "腎上腺素", "納洛酮", "碳酸氫鈉"],
+            correct: 0,
+            explanation: "ECT前注射阿托品（Atropina）可減少呼吸道分泌物，防止心率過慢。"
+        });
+
+        // 題目80
+        fullQuestionBank.push({
+            question: "80. 下列哪項不是抗抑鬱藥常見副作用？",
+            options: ["口乾便秘", "嗜睡", "高血壓危象", "體重增加"],
+            correct: 2,
+            explanation: "高血壓危象多見於MAOI類與含酪胺食物同服，一般抗抑鬱藥少見。"
+        });
+
+        // 題目81
+        fullQuestionBank.push({
+            question: "81. 澳門衛生局規定的傳染病強制申報，下列哪項必須立即報告？",
+            options: ["流感", "肺結核", "愛滋病", "霍亂"],
+            correct: 3,
+            explanation: "霍亂屬甲類傳染病（檢疫傳染病），須2小時內上報；肺結核、愛滋病等按規定時限報告。"
+        });
+
+        // 題目82
+        fullQuestionBank.push({
+            question: "82. 社區衛生服務的中心任務是？",
+            options: ["治療疾病", "健康教育與預防", "康復護理", "家庭病床"],
+            correct: 1,
+            explanation: "社區衛生以預防保健、健康教育為重點，促進居民健康。"
+        });
+
+        // 題目83
+        fullQuestionBank.push({
+            question: "83. 護理倫理原則中，「不傷害」原則的體現是？",
+            options: ["尊重病人自主", "為病人保密", "避免醫療差錯", "合理分配資源"],
+            correct: 2,
+            explanation: "「不傷害」要求護士在照護中避免造成病人身心傷害，如操作失誤、疏忽等。"
+        });
+
+        // 題目84
+        fullQuestionBank.push({
+            question: "84. 下列哪項行為違反病人隱私權？",
+            options: ["在護理站討論病人病情", "床旁交接班", "將病歷鎖在抽屜", "經病人同意拍攝照片教學"],
+            correct: 0,
+            explanation: "在公共區域討論病情可能被他人聽見，侵犯隱私；交接班應避免提及敏感信息。"
+        });
+
+        // 題目85
+        fullQuestionBank.push({
+            question: "85. 結核病防治中，對痰菌陽性病人最重要的護理措施是？",
+            options: ["呼吸道隔離", "消化道隔離", "接觸隔離", "保護性隔離"],
+            correct: 0,
+            explanation: "肺結核經飛沫傳播，需呼吸道隔離（戴口罩、單間、通風）。"
+        });
+
+        // 題目86
+        fullQuestionBank.push({
+            question: "86. 下列哪項屬於醫院感染的易感人群？",
+            options: ["健康產婦", "年輕外科醫生", "老年糖尿病患者", "門診病人"],
+            correct: 2,
+            explanation: "老年人、糖尿病、免疫低下、大手術後等為醫院感染高危人群。"
+        });
+
+        // 題目87
+        fullQuestionBank.push({
+            question: "87. 護士執行醫囑時，發現醫囑有明顯錯誤，應如何處理？",
+            options: ["執行後再質疑", "與醫生核實後再執行", "直接拒絕執行", "按自己判斷修改"],
+            correct: 1,
+            explanation: "護士有審查醫囑的責任，發現錯誤應先與開立醫生溝通核實，確認無誤後執行。"
+        });
+
+        // 題目88
+        fullQuestionBank.push({
+            question: "88. 澳門護士註冊制度由哪個機構負責？",
+            options: ["衛生局", "教育及青年發展局", "社會工作局", "鏡湖醫院"],
+            correct: 0,
+            explanation: "澳門護士註冊及執業監管由衛生局負責，必須通過資格認可。"
+        });
+
+        // 題目89
+        fullQuestionBank.push({
+            question: "89. 下列哪項不是護士在安寧療護中的角色？",
+            options: ["疼痛控制", "心理支持", "延長生命搶救", "協助家屬哀傷輔導"],
+            correct: 2,
+            explanation: "安寧療護以舒緩症狀、提高生命質量為主，不進行無意義的搶救。"
+        });
+
+        // 題目90
+        fullQuestionBank.push({
+            question: "90. 為聽力障礙老人進行健康教育，最好的方式是？",
+            options: ["大聲吼叫", "書面資料配合口頭解釋", "讓家屬轉述", "播放錄音帶"],
+            correct: 1,
+            explanation: "應使用多種方式結合，書面資料、手勢、面對面口型清晰、必要時助聽器。"
+        });
+
+        // 題目91
+        fullQuestionBank.push({
+            question: "91. 根據澳門《傳染病防治法》，發現疑似麻疹病例應在多長時間內申報？",
+            options: ["1小時", "24小時", "1週", "1個月"],
+            correct: 1,
+            explanation: "麻疹屬法定需申報傳染病，通常24小時內通過指定系統申報。"
+        });
+
+        // 題目92
+        fullQuestionBank.push({
+            question: "92. 下列哪種消毒劑不能用於黏膜消毒？",
+            options: ["75%酒精", "0.5%碘伏", "3%過氧化氫", "含氯消毒劑"],
+            correct: 3,
+            explanation: "含氯消毒劑（如次氯酸鈉）刺激性強，不可用於黏膜，僅用於環境、物體表面。"
+        });
+
+        // 題目93
+        fullQuestionBank.push({
+            question: "93. 手術器械滅菌首選？",
+            options: ["煮沸", "高壓蒸氣滅菌", "環氧乙烷", "2%戊二醛浸泡"],
+            correct: 1,
+            explanation: "耐熱耐濕器械首選高壓蒸氣滅菌（壓力飽和蒸氣），效果可靠。"
+        });
+
+        // 題目94
+        fullQuestionBank.push({
+            question: "94. 醫療廢物分類中，使用後的針頭應投入？",
+            options: ["黑色垃圾袋", "黃色醫療廢物袋", "紅色垃圾袋", "專用銳器盒"],
+            correct: 3,
+            explanation: "銳器（針頭、刀片）必須放入防刺穿的銳器盒，防止職業暴露。"
+        });
+
+        // 題目95
+        fullQuestionBank.push({
+            question: "95. 澳門醫院感染控制中，MRSA（耐甲氧西林金黃色葡萄球菌）病人應採取？",
+            options: ["標準預防", "接觸隔離", "飛沫隔離", "空氣隔離"],
+            correct: 1,
+            explanation: "MRSA主要經接觸傳播，應採取接觸隔離（單間或隔離區域、穿隔離衣、戴手套）。"
+        });
+
+        // 題目96
+        fullQuestionBank.push({
+            question: "96. 七步洗手法總時間應不少於？",
+            options: ["10秒", "15秒", "40-60秒", "2分鐘"],
+            correct: 2,
+            explanation: "WHO建議醫護人員洗手時間不少於40-60秒（包括沖水）。"
+        });
+
+        // 題目97
+        fullQuestionBank.push({
+            question: "97. 下列哪項不屬於標準預防的措施？",
+            options: ["接觸病人前後洗手", "可能接觸血液體液時戴手套", "病人單間隔離", "處理針頭後不回套"],
+            correct: 2,
+            explanation: "標準預防適用於所有病人，包括手衛生、個人防護、安全注射等；單間隔離是針對傳播途徑的額外預防措施。"
+        });
+
+        // 題目98
+        fullQuestionBank.push({
+            question: "98. 澳門《護理職務法》規定，護士不得從事？",
+            options: ["執行醫囑給藥", "獨立處方藥物", "健康評估", "傷口換藥"],
+            correct: 1,
+            explanation: "澳門護士無處方權，必須由醫生開立處方後給藥。"
+        });
+
+        // 題目99
+        fullQuestionBank.push({
+            question: "99. 發生針刺傷後，首要處理步驟為？",
+            options: ["立即擠血並沖洗", "報告上級", "抽血化驗", "接種疫苗"],
+            correct: 0,
+            explanation: "立即在傷口旁擠出血液，用流動水或肥皂水沖洗，再用碘伏消毒，然後報告並評估暴露源。"
+        });
+
+        // 題目100
+        fullQuestionBank.push({
+            question: "100. 下列哪種情況需要進行空氣隔離？",
+            options: ["水痘", "細菌性痢疾", "乙型肝炎", "愛滋病"],
+            correct: 0,
+            explanation: "水痘經空氣傳播（飛沫核懸浮），需空氣隔離（負壓病房、N95口罩）。"
+        });
+        // 題目101
+        fullQuestionBank.push({
+            question: "101. 測量口溫時，體溫計應放置於舌下哪個位置？",
+            options: ["舌繫帶兩側的熱窩", "舌尖下方", "舌面中央", "牙齒與頰黏膜之間"],
+            correct: 0,
+            explanation: "舌下熱窩靠近舌動脈，溫度最接近核心溫度，應放置於此處。"
+        });
+        // 題目102
+        fullQuestionBank.push({
+            question: "102. 為病人進行鼻導管給氧，流量調節為2L/min，此時吸入氧濃度約為？",
+            options: ["25%", "29%", "33%", "37%"],
+            correct: 1,
+            explanation: "鼻導管給氧濃度計算公式：21+4×流量(L/min)，2L/min時約29%。"
+        });
+        // 題目103
+        fullQuestionBank.push({
+            question: "103. 執行肌肉注射時，為避免損傷神經和血管，下列何種注射部位最安全？",
+            options: ["臀大肌外上1/4", "臀大肌內上1/4", "臀大肌外下1/4", "臀大肌內下1/4"],
+            correct: 0,
+            explanation: "臀大肌注射應選擇外上象限（避開坐骨神經和臀上血管）。"
+        });
+        // 題目104
+        fullQuestionBank.push({
+            question: "104. 測量血壓時，袖帶過鬆會導致血壓值？",
+            options: ["偏高", "偏低", "無影響", "先高後低"],
+            correct: 0,
+            explanation: "袖帶過鬆使氣囊充氣時無法完全壓迫動脈，需更高壓力才能阻斷血流，故測得血壓偏高。"
+        });
+        // 題目105
+        fullQuestionBank.push({
+            question: "105. 下列哪項不是晨間護理的內容？",
+            options: ["協助排便", "口腔護理", "更換床單", "睡前洗腳"],
+            correct: 3,
+            explanation: "睡前洗腳屬於晚間護理，晨間護理著重於清潔、整理、觀察病情。"
+        });
+        // 題目106
+        fullQuestionBank.push({
+            question: "106. 長期臥床病人預防壓瘡，最有效的措施是？",
+            options: ["睡氣墊床", "定時翻身", "按摩受壓部位", "保持床鋪平整"],
+            correct: 1,
+            explanation: "定時翻身（每2小時）是最直接、最有效的減壓方法。"
+        });
+        // 題目107
+        fullQuestionBank.push({
+            question: "107. 進行口腔護理時，昏迷病人應採取的體位為？",
+            options: ["平臥頭偏向一側", "半坐臥", "俯臥", "端坐位"],
+            correct: 0,
+            explanation: "昏迷病人平臥頭偏向一側，防止誤吸，操作時使用開口器、舌鉗等。"
+        });
+        // 題目108
+        fullQuestionBank.push({
+            question: "108. 下列哪種溶液不適用於清潔傷口？",
+            options: ["生理鹽水", "0.5%碘伏", "3%過氧化氫", "75%酒精"],
+            correct: 3,
+            explanation: "75%酒精刺激性強，不宜用於開放性傷口，以免疼痛和組織損傷。"
+        });
+        // 題目109
+        fullQuestionBank.push({
+            question: "109. 測量直腸溫度時，體溫計插入深度為？",
+            options: ["1-2cm", "3-4cm", "5-6cm", "7-8cm"],
+            correct: 1,
+            explanation: "成人直腸測溫插入3-4cm，嬰兒2-3cm，避免過深損傷腸道。"
+        });
+        // 題目110
+        fullQuestionBank.push({
+            question: "110. 鼻飼飲食時，每次灌注量一般不超過？",
+            options: ["100ml", "200ml", "300ml", "400ml"],
+            correct: 1,
+            explanation: "每次鼻飼量200ml，間隔2小時以上，溫度38-40℃。"
+        });
+        // 題目111
+        fullQuestionBank.push({
+            question: "111. 病人需同時服用多種藥物，下列哪種藥物應最後服用？",
+            options: ["止咳糖漿", "抗生素", "降壓藥", "利尿劑"],
+            correct: 0,
+            explanation: "止咳糖漿服後不宜立即喝水，以免稀釋藥液減弱療效，故應最後服用。"
+        });
+        // 題目112
+        fullQuestionBank.push({
+            question: "112. 輸血過程中，病人出現頭痛、面部潮紅、呼吸困難，可能是何種反應？",
+            options: ["發熱反應", "過敏反應", "溶血反應", "循環負荷過重"],
+            correct: 1,
+            explanation: "過敏反應表現為皮膚瘙癢、蕁麻疹、血管神經性水腫，嚴重時呼吸困難。"
+        });
+        // 題目113
+        fullQuestionBank.push({
+            question: "113. 為女病人導尿，第二次消毒尿道口順序為？",
+            options: ["由內向外再消毒一次", "由上向下，由外向內", "只消毒尿道口", "由內向外，不可再來回"],
+            correct: 0,
+            explanation: "第二次消毒以尿道口為中心，由內向外再消毒一次，避免污染。"
+        });
+        // 題目114
+        fullQuestionBank.push({
+            question: "114. 測量血壓時，聽診器應置於？",
+            options: ["袖帶內", "袖帶下緣肘動脈搏動處", "袖帶上方", "肘窩正中"],
+            correct: 1,
+            explanation: "聽診器胸件應置於袖帶下緣肘動脈搏動最明顯處，不可塞入袖帶內。"
+        });
+        // 題目115
+        fullQuestionBank.push({
+            question: "115. 下列哪項屬於被動性被動運動？",
+            options: ["病人自己活動關節", "護士協助病人活動", "護士完全帶動病人肢體活動", "病人利用健側幫助患側"],
+            correct: 2,
+            explanation: "被動運動指病人無力活動時，由他人完全帶動肢體進行活動。"
+        });
+        // 題目116
+        fullQuestionBank.push({
+            question: "116. 給藥時，需記錄「五正確」不包括？",
+            options: ["病人正確", "藥物正確", "時間正確", "價格正確"],
+            correct: 3,
+            explanation: "五正確：病人、藥物、劑量、時間、途徑。"
+        });
+        // 題目117
+        fullQuestionBank.push({
+            question: "117. 熱敷時，局部皮膚出現潮紅、疼痛，應？",
+            options: ["繼續熱敷", "停止熱敷，塗凡士林", "降低溫度繼續", "塗酒精散熱"],
+            correct: 1,
+            explanation: "出現燙傷徵象應立即停止，並塗凡士林保護皮膚。"
+        });
+        // 題目118
+        fullQuestionBank.push({
+            question: "118. 為病人進行酒精擦浴降溫，禁忌擦拭部位不包括？",
+            options: ["胸前區", "腹部", "足底", "腋下"],
+            correct: 3,
+            explanation: "禁忌部位：胸前區（反射性心率減慢）、腹部（腹瀉）、足底（一過性冠脈收縮）。腋下可擦拭。"
+        });
+        // 題目119
+        fullQuestionBank.push({
+            question: "119. 長期留置導尿管的病人，為預防感染，應？",
+            options: ["每日用消毒液沖洗膀胱", "定時夾閉訓練膀胱功能", "更換導尿管", "鼓勵多飲水"],
+            correct: 3,
+            explanation: "多飲水可增加尿量，沖洗尿道，是預防感染最簡單有效的方法。"
+        });
+        // 題目120
+        fullQuestionBank.push({
+            question: "120. 病人瀕死期出現迴光返照，其機制為？",
+            options: ["大腦皮層抑制解除", "腎上腺素大量釋放", "缺氧狀態改善", "疼痛減輕"],
+            correct: 1,
+            explanation: "瀕死期腎上腺髓質分泌大量兒茶酚胺，使血壓回升、意識短暫清醒。"
+        });
+        // 題目121
+        fullQuestionBank.push({
+            question: "121. 肺源性心臟病病人，出現呼吸困難、頸靜脈怒張、下肢水腫，首要護理診斷為？",
+            options: ["體液過多", "氣體交換受損", "活動無耐力", "焦慮"],
+            correct: 1,
+            explanation: "病人已有右心衰竭合併缺氧，氣體交換受損最優先。"
+        });
+        // 題目122
+        fullQuestionBank.push({
+            question: "122. 使用硝苯地平（Nifedipine·葡: Nifedipina）治療高血壓，最常見的副作用為？",
+            options: ["乾咳", "頭痛、顏面潮紅", "低血鉀", "水鈉潴留"],
+            correct: 1,
+            explanation: "硝苯地平為二氫吡啶類CCB，擴張血管引起頭痛、潮紅、踝部水腫。"
+        });
+        // 題目123
+        fullQuestionBank.push({
+            question: "123. 服用鐵劑治療缺鐵性貧血，下列何種食物可促進吸收？",
+            options: ["濃茶", "牛奶", "橙汁", "菠菜"],
+            correct: 2,
+            explanation: "維生素C（橙汁）可將三價鐵還原為二價鐵，促進吸收；茶、牛奶、菠菜抑制吸收。"
+        });
+        // 題目124
+        fullQuestionBank.push({
+            question: "124. 急性心肌梗死病人，血清心肌酶最先升高的是？",
+            options: ["CK-MB", "LDH", "AST", "肌鈣蛋白"],
+            correct: 0,
+            explanation: "CK-MB在發病4-6小時開始升高，16-24小時達高峰；肌鈣蛋白稍晚但特異性高。"
+        });
+        // 題目125
+        fullQuestionBank.push({
+            question: "125. 糖尿病酮症酸中毒病人，呼吸可出現？",
+            options: ["潮式呼吸", "深大呼吸（Kussmaul呼吸）", "間停呼吸", "嘆息樣呼吸"],
+            correct: 1,
+            explanation: "酸中毒刺激呼吸中樞，出現深快呼吸（Kussmaul呼吸），呼氣有爛蘋果味。"
+        });
+        // 題目126
+        fullQuestionBank.push({
+            question: "126. 下列哪種降壓藥可引起電解質紊亂（低血鉀、低血鈉）？",
+            options: ["氫氯噻嗪（Hydrochlorothiazide）", "普萘洛爾（Propranolol）", "可樂定（Clonidine）", "肼屈嗪（Hydralazine）"],
+            correct: 0,
+            explanation: "噻嗪類利尿劑（氫氯噻嗪·葡: Hidroclorotiazida）排鉀排鈉，可致低血鉀、低血鈉。"
+        });
+        // 題目127
+        fullQuestionBank.push({
+            question: "127. 肝硬化病人出現腹水，最常用的利尿劑組合是？",
+            options: ["呋塞米+螺內酯", "氫氯噻嗪+氨苯蝶啶", "甘露醇+呋塞米", "乙酰唑胺"],
+            correct: 0,
+            explanation: "呋塞米排鉀，螺內酯保鉀，聯用可增強利尿並減少電解質紊亂，且螺內酯可對抗醛固酮。"
+        });
+        // 題目128
+        fullQuestionBank.push({
+            question: "128. 使用氨茶鹼（Aminophylline·葡: Aminofilina）靜脈注射時，必須注意？",
+            options: ["稀釋後緩慢注射", "與葡萄糖混合", "飯後服用", "監測血藥濃度"],
+            correct: 0,
+            explanation: "氨茶鹼靜注過快可引起心律失常、血壓下降、驚厥，必須稀釋後緩慢注射（＞10分鐘）。"
+        });
+        // 題目129
+        fullQuestionBank.push({
+            question: "129. 類風濕關節炎病人，下列哪項護理措施不當？",
+            options: ["急性期關節制動", "緩解期功能鍛鍊", "長期服用糖皮質激素控制病情", "晨起熱敷關節"],
+            correct: 2,
+            explanation: "激素可迅速消炎，但不能阻止關節破壞，且副作用大，應聯合改善病情抗風濕藥（DMARDs）。"
+        });
+        // 題目130
+        fullQuestionBank.push({
+            question: "130. 急性腎盂腎炎病人，留取中段尿培養，最可靠的採集時間為？",
+            options: ["使用抗生素後", "清晨第一次尿", "隨時留取", "大量飲水後"],
+            correct: 1,
+            explanation: "清晨第一次尿在膀胱停留時間長，細菌濃度最高，陽性率高。"
+        });
+        // 題目131
+        fullQuestionBank.push({
+            question: "131. 帕金森病患者服用左旋多巴，為減少外周副作用，常聯用？",
+            options: ["卡比多巴（Carbidopa）", "司來吉蘭", "金剛烷胺", "苯海索"],
+            correct: 0,
+            explanation: "卡比多巴（Carbidopa·葡: Carbidopa）抑制外周多巴脫羧酶，減少左旋多巴在外周轉化，增加入腦量。"
+        });
+        // 題目132
+        fullQuestionBank.push({
+            question: "132. 下列哪項不是甲狀腺功能亢進症的典型表現？",
+            options: ["食慾亢進、體重下降", "怕熱多汗", "心率緩慢", "煩躁易怒"],
+            correct: 2,
+            explanation: "甲亢病人因代謝亢進，心率加快而非減慢，心動過速是常見表現。"
+        });
+        // 題目133
+        fullQuestionBank.push({
+            question: "133. 使用強心苷（如地高辛）期間，應避免同時使用何種藥物以免中毒？",
+            options: ["氫氯噻嗪", "螺內酯", "氯化鉀", "門冬氨酸鉀鎂"],
+            correct: 0,
+            explanation: "氫氯噻嗪排鉀，低血鉀可誘發強心苷中毒，用藥期間需監測血鉀。"
+        });
+        // 題目134
+        fullQuestionBank.push({
+            question: "134. 支氣管擴張症病人，最典型的體徵是？",
+            options: ["持續性乾囉音", "固定性濕囉音", "哮鳴音", "胸膜摩擦音"],
+            correct: 1,
+            explanation: "支擴病人因氣道持久擴張，分泌物積聚，可聞及固定性濕囉音（部位恆定）。"
+        });
+        // 題目135
+        fullQuestionBank.push({
+            question: "135. 下列哪項檢查對診斷肺栓塞最有特異性？",
+            options: ["D-二聚體", "CT肺動脈造影", "心電圖", "動脈血氣分析"],
+            correct: 1,
+            explanation: "CT肺動脈造影（CTPA）可直接顯示血栓，是診斷肺栓塞的金標準。"
+        });
+        // 題目136
+        fullQuestionBank.push({
+            question: "136. 潰瘍性結腸炎病人，腹瀉特點是？",
+            options: ["黏液膿血便", "白陶土樣便", "果醬樣便", "水樣便"],
+            correct: 0,
+            explanation: "潰瘍性結腸炎病變在直腸、結腸黏膜，表現為黏液膿血便，裡急後重。"
+        });
+        // 題目137
+        fullQuestionBank.push({
+            question: "137. 下列哪種藥物不能用於治療痛風急性發作？",
+            options: ["秋水仙鹼", "別嘌醇", "吲哚美辛", "潑尼松"],
+            correct: 1,
+            explanation: "別嘌醇（Allopurinol·葡: Alopurinol）為抑制尿酸生成藥，急性期使用會因尿酸波動加重炎症，應在緩解期使用。"
+        });
+        // 題目138
+        fullQuestionBank.push({
+            question: "138. 再生障礙性貧血病人，最常見的死亡原因為？",
+            options: ["貧血性心臟病", "顱內出血", "嚴重感染", "肝腎功能衰竭"],
+            correct: 2,
+            explanation: "再障因全血細胞減少，中性粒細胞缺乏，易發生嚴重感染，為主要死因。"
+        });
+        // 題目139
+        fullQuestionBank.push({
+            question: "139. 慢性腎衰竭病人，最早出現的臨床症狀是？",
+            options: ["噁心、食慾減退", "水腫", "皮膚瘙癢", "嗜睡"],
+            correct: 0,
+            explanation: "消化道症狀（噁心、食慾不振）是慢性腎衰最早、最常見的表現。"
+        });
+        // 題目140
+        fullQuestionBank.push({
+            question: "140. 使用胰島素泵的病人，最需要注意的併發症是？",
+            options: ["低血糖", "酮症酸中毒", "導管堵塞", "皮下脂肪增生"],
+            correct: 0,
+            explanation: "胰島素泵持續輸注基礎量，若劑量不當或進食減少，易發生低血糖。"
+        });
+        // 題目141
+        fullQuestionBank.push({
+            question: "141. 下列哪項不是系統性紅斑狼瘡（SLE）的皮膚表現？",
+            options: ["蝶形紅斑", "盤狀紅斑", "光過敏", "玫瑰疹"],
+            correct: 3,
+            explanation: "玫瑰疹多見於傷寒，非SLE特徵。SLE皮膚表現包括蝶形紅斑、盤狀紅斑、光過敏、口腔潰瘍。"
+        });
+        // 題目142
+        fullQuestionBank.push({
+            question: "142. 格林-巴利症候群病人，最危險的併發症是？",
+            options: ["呼吸肌麻痺", "心肌炎", "尿潴留", "深靜脈血栓"],
+            correct: 0,
+            explanation: "本病可累及呼吸肌，導致呼吸衰竭，需密切監測肺活量、氣管插管準備。"
+        });
+        // 題目143
+        fullQuestionBank.push({
+            question: "143. 使用苯妥英鈉（Phenytoin·葡: Fenitoína）治療癲癇，不良反應不包括？",
+            options: ["牙齦增生", "共濟失調", "粒細胞減少", "低血糖"],
+            correct: 3,
+            explanation: "苯妥英鈉可致牙齦增生、共濟失調、粒細胞減少、皮疹，但不可起低血糖。"
+        });
+        // 題目144
+        fullQuestionBank.push({
+            question: "144. 結核性胸膜炎病人，胸腔積液多為？",
+            options: ["漏出液", "滲出液（草黃色）", "血性", "膿性"],
+            correct: 1,
+            explanation: "結核性胸膜炎積液為滲出液，草黃色，以淋巴細胞為主。"
+        });
+        // 題目145
+        fullQuestionBank.push({
+            question: "145. 急性胰腺炎病人，下列哪項檢查最具診斷價值？",
+            options: ["血澱粉酶", "尿澱粉酶", "血清脂肪酶", "B超"],
+            correct: 0,
+            explanation: "血澱粉酶在發病6-12小時升高，48小時開始下降，是早期診斷首選。"
+        });
+        // 題目146
+        fullQuestionBank.push({
+            question: "146. 使用華法林（Warfarin）時，INR值過高（＞4.5）且無出血，應如何處理？",
+            options: ["立即停藥，觀察", "靜脈注射維生素K1", "輸注新鮮冰凍血漿", "繼續原量"],
+            correct: 0,
+            explanation: "INR＞4.5但無出血，可暫停華法林，監測INR恢復至目標範圍後再調整劑量。嚴重出血時用維生素K1拮抗。"
+        });
+        // 題目147
+        fullQuestionBank.push({
+            question: "147. 慢性阻塞性肺疾病（COPD）病人，長期家庭氧療的指徵為？",
+            options: ["PaO2＜55mmHg", "PaO2＜60mmHg伴肺心病", "血氧飽和度＜88%", "以上皆是"],
+            correct: 3,
+            explanation: "長期氧療（每天＞15小時）指徵：PaO2≤55mmHg或SaO2≤88%，或PaO2 56-60mmHg伴肺心病、紅細胞增多。"
+        });
+        // 題目148
+        fullQuestionBank.push({
+            question: "148. 下列哪種藥物不能用於急性心肌梗死後的心律失常？",
+            options: ["利多卡因", "胺碘酮", "普羅帕酮", "阿托品"],
+            correct: 2,
+            explanation: "普羅帕酮（心律平）有負性肌力作用，可能增加心梗後死亡率，CAST試驗證實其有害。"
+        });
+        // 題目149
+        fullQuestionBank.push({
+            question: "149. 肝硬化病人出現撲翼樣震顫，提示血氨可能？",
+            options: ["正常", "降低", "升高", "無關"],
+            correct: 2,
+            explanation: "肝性腦病時血氨升高，干擾中樞神經遞質，導致撲翼樣震顫。"
+        });
+        // 題目150
+        fullQuestionBank.push({
+            question: "150. 使用多巴酚丁胺（Dobutamine·葡: Dobutamina）治療心力衰竭，其主要作用是？",
+            options: ["收縮血管升壓", "擴張血管", "增強心肌收縮力", "利尿"],
+            correct: 2,
+            explanation: "多巴酚丁胺為β1受體激動劑，主要增強心肌收縮力，用於低心排血量心衰。"
+        });
+        // 題目151
+        fullQuestionBank.push({
+            question: "151. 術後病人出現腹脹、不排便，最常見原因為？",
+            options: ["腸梗阻", "腸蠕動受抑制", "腹膜炎", "低血鉀"],
+            correct: 1,
+            explanation: "麻醉、手術操作可致腸蠕動暫時抑制，引起腹脹，多為功能性。"
+        });
+        // 題目152
+        fullQuestionBank.push({
+            question: "152. 甲狀腺危象的緊急處理不包括？",
+            options: ["丙硫氧嘧啶", "複方碘溶液", "普萘洛爾", "甲狀腺素片"],
+            correct: 3,
+            explanation: "甲狀腺危象需抑制甲狀腺激素合成（丙硫氧嘧啶）和釋放（碘劑）、控制症狀（普萘洛爾），禁用甲狀腺素。"
+        });
+        // 題目153
+        fullQuestionBank.push({
+            question: "153. 乳癌根治術後，病人患側上肢護理錯誤的是？",
+            options: ["避免測量血壓", "避免提重物", "按摩促進淋巴迴流", "平臥時患肢下垂"],
+            correct: 3,
+            explanation: "術後患肢應抬高，促進淋巴迴流，減輕水腫，不可下垂。"
+        });
+        // 題目154
+        fullQuestionBank.push({
+            question: "154. 胃大部切除術後，病人進食後出現上腹脹痛、噁心、嘔吐膽汁，可能為？",
+            options: ["傾倒症候群", "鹼性反流性胃炎", "吻合口梗阻", "輸出袢梗阻"],
+            correct: 1,
+            explanation: "膽汁反流入殘胃，引起上腹燒灼痛、嘔吐膽汁，吐後不緩解，為鹼性反流性胃炎。"
+        });
+        // 題目155
+        fullQuestionBank.push({
+            question: "155. 結腸造口（人工肛門）病人，飲食應注意？",
+            options: ["多吃產氣食物", "少吃纖維素", "定時進食，充分咀嚼", "限制飲水"],
+            correct: 2,
+            explanation: "定時進食、細嚼慢嚥可減少腸道刺激和產氣，產氣食物（豆類、洋蔥）應少吃。"
+        });
+        // 題目156
+        fullQuestionBank.push({
+            question: "156. 顱腦損傷病人出現一側瞳孔散大、對光反射消失，提示？",
+            options: ["顱內高壓早期", "腦疝形成", "視神經損傷", "動眼神經麻痺"],
+            correct: 1,
+            explanation: "一側瞳孔散大、對光反射消失是小腦幕切跡疝的典型表現（動眼神經受壓）。"
+        });
+        // 題目157
+        fullQuestionBank.push({
+            question: "157. 胸腔閉式引流中，水封瓶長管內水柱波動消失，且病人呼吸困難，最可能為？",
+            options: ["引流管通暢", "肺已復張", "引流管堵塞", "水封瓶破裂"],
+            correct: 2,
+            explanation: "水柱波動消失伴呼吸困難，提示引流管堵塞，需擠壓或更換。"
+        });
+        // 題目158
+        fullQuestionBank.push({
+            question: "158. 急性化膿性骨髓炎最常見的致病菌是？",
+            options: ["金黃色葡萄球菌", "鏈球菌", "大腸桿菌", "綠膿桿菌"],
+            correct: 0,
+            explanation: "金黃色葡萄球菌是急性骨髓炎最常見病原體，多由血源性感染引起。"
+        });
+        // 題目159
+        fullQuestionBank.push({
+            question: "159. 燒傷病人補液時，判斷血容量是否充足的簡便指標是？",
+            options: ["血壓", "脈搏", "尿量", "中心靜脈壓"],
+            correct: 2,
+            explanation: "尿量是反映腎灌注的可靠指標，成人應維持＞30ml/h。"
+        });
+        // 題目160
+        fullQuestionBank.push({
+            question: "160. 手術前訪視的主要目的是？",
+            options: ["簽署手術同意書", "了解病情，給予心理支持", "確定麻醉方式", "進行術前用藥"],
+            correct: 1,
+            explanation: "護士術前訪視目的為評估病人、減輕焦慮、提供指導。"
+        });
+        // 題目161
+        fullQuestionBank.push({
+            question: "161. 全麻未清醒病人，應採取何種體位？",
+            options: ["去枕平臥頭偏向一側", "半坐臥", "側臥位", "俯臥位"],
+            correct: 0,
+            explanation: "去枕平臥頭偏向一側，防止嘔吐物誤吸，保持呼吸道通暢。"
+        });
+        // 題目162
+        fullQuestionBank.push({
+            question: "162. 破傷風病人，肌肉陣發性痙攣，護理重點不包括？",
+            options: ["單獨隔離、避光", "保持呼吸道通暢", "高熱量高蛋白飲食", "強制約束肢體防止受傷"],
+            correct: 3,
+            explanation: "應避免強制約束，以免刺激引起更嚴重痙攣，可用床欄、軟墊保護。"
+        });
+        // 題目163
+        fullQuestionBank.push({
+            question: "163. 腎移植術後，最應警惕的併發症是？",
+            options: ["感染", "排斥反應", "出血", "尿瘻"],
+            correct: 1,
+            explanation: "急性排斥反應是術後最常見且影響移植腎存活的關鍵併發症。"
+        });
+        // 題目164
+        fullQuestionBank.push({
+            question: "164. 腸梗阻病人出現持續性腹痛、腹脹、嘔吐物呈咖啡色，提示？",
+            options: ["痙攣性腸梗阻", "絞窄性腸梗阻", "麻痺性腸梗阻", "高位腸梗阻"],
+            correct: 1,
+            explanation: "絞窄性腸梗阻因腸壁缺血，腹痛持續劇烈，嘔吐物或糞便呈血性。"
+        });
+        // 題目165
+        fullQuestionBank.push({
+            question: "165. 泌尿系統結石病人，體外衝擊波碎石術後，最重要的護理是？",
+            options: ["多飲水，每日3000ml以上", "絕對臥床", "應用抗生素", "監測血壓"],
+            correct: 0,
+            explanation: "多飲水可沖洗尿路，促進碎石排出，預防感染。"
+        });
+        // 題目166
+        fullQuestionBank.push({
+            question: "166. 下肢深靜脈血栓形成病人，急性期應？",
+            options: ["按摩患肢促進回流", "抬高患肢、制動", "熱敷", "下床活動"],
+            correct: 1,
+            explanation: "急性期應抬高患肢、制動，避免按摩，以防血栓脫落導致肺栓塞。"
+        });
+        // 題目167
+        fullQuestionBank.push({
+            question: "167. 骨折復位固定後，病人進行肌肉等長收縮訓練的主要目的是？",
+            options: ["增強肌力，防止萎縮", "促進骨折癒合", "增加關節活動度", "減輕水腫"],
+            correct: 0,
+            explanation: "等長收縮（肌肉收縮但不引起關節活動）可維持肌力，防止廢用性萎縮。"
+        });
+        // 題目168
+        fullQuestionBank.push({
+            question: "168. 下列哪項不是急性闌尾炎的典型體徵？",
+            options: ["轉移性右下腹痛", "麥氏點壓痛", "腰大肌試驗陽性", "Murphy徵陽性"],
+            correct: 3,
+            explanation: "Murphy徵（吸氣時觸診右肋下疼痛）是急性膽囊炎的體徵。"
+        });
+        // 題目169
+        fullQuestionBank.push({
+            question: "169. 食管癌術後，病人出現胸悶、呼吸困難、脈速，聽診患側呼吸音消失，可能為？",
+            options: ["肺不張", "肺炎", "乳糜胸", "液氣胸"],
+            correct: 3,
+            explanation: "術後可能發生吻合口瘻或胸導管損傷，引起液氣胸，出現呼吸困難、呼吸音消失。"
+        });
+        // 題目170
+        fullQuestionBank.push({
+            question: "170. 老年男性病人，進行性排尿困難，最常見原因為？",
+            options: ["前列腺增生", "膀胱腫瘤", "尿道狹窄", "神經源性膀胱"],
+            correct: 0,
+            explanation: "良性前列腺增生是老年男性排尿困難最常見原因。"
+        });
+        // 題目171
+        fullQuestionBank.push({
+            question: "171. 燒傷病人創面出現銅綠假單胞菌感染，最有效的局部用藥是？",
+            options: ["磺胺嘧啶銀", "莫匹羅星", "碘伏", "過氧化氫"],
+            correct: 0,
+            explanation: "磺胺嘧啶銀（Sulfadiazina de prata）對銅綠假單胞菌有效，且穿透力強，為燒傷常用。"
+        });
+        // 題目172
+        fullQuestionBank.push({
+            question: "172. 甲狀腺大部分切除術後，病人出現聲音嘶啞，可能損傷了？",
+            options: ["喉返神經", "喉上神經內支", "喉上神經外支", "甲狀旁腺"],
+            correct: 0,
+            explanation: "喉返神經支配聲帶運動，損傷可致聲音嘶啞；喉上神經外支損傷致音調降低。"
+        });
+        // 題目173
+        fullQuestionBank.push({
+            question: "173. 膀胱腫瘤病人，行膀胱全切迴腸代膀胱術後，護理錯誤的是？",
+            options: ["觀察造口血運", "使用造口袋收集尿液", "鼓勵病人多飲水", "限制蛋白質攝入"],
+            correct: 3,
+            explanation: "術後需高蛋白質促進癒合，不宜限制。"
+        });
+        // 題目174
+        fullQuestionBank.push({
+            question: "174. 張力性氣胸的急救處理是？",
+            options: ["加壓包紮", "胸腔閉式引流", "粗針頭減壓", "給氧"],
+            correct: 2,
+            explanation: "張力性氣胸需緊急排氣，用粗針頭在鎖骨中線第二肋間穿刺減壓，再行引流。"
+        });
+        // 題目175
+        fullQuestionBank.push({
+            question: "175. 骨折病人出現脂肪栓塞症候群，最典型的表現是？",
+            options: ["呼吸困難、發紺、意識障礙、皮膚出血點", "劇烈疼痛", "局部腫脹", "發熱"],
+            correct: 0,
+            explanation: "脂肪栓塞多發生在長骨骨折後，表現為呼吸困難、神經症狀、皮膚瘀點（出血點）。"
+        });
+        // 題目176
+        fullQuestionBank.push({
+            question: "176. 正常胎動每小時不少於多少次？",
+            options: ["1-2次", "3-5次", "6-8次", "9-10次"],
+            correct: 1,
+            explanation: "正常胎動每小時不少於3-5次，12小時不少於30次。"
+        });
+        // 題目177
+        fullQuestionBank.push({
+            question: "177. 妊娠高血壓疾病病人，使用硫酸鎂治療時，膝反射消失，此時血鎂濃度可能為？",
+            options: ["1-2mmol/L", "2-3mmol/L", "3-4mmol/L", "4-5mmol/L"],
+            correct: 3,
+            explanation: "硫酸鎂治療濃度2-3mmol/L，膝反射消失提示已接近中毒（＞4mmol/L）。"
+        });
+        // 題目178
+        fullQuestionBank.push({
+            question: "178. 胎盤早剝與前置胎盤的鑑別點，最主要為？",
+            options: ["出血顏色", "腹痛程度", "有無高血壓", "子宮張力"],
+            correct: 3,
+            explanation: "胎盤早剝子宮呈板樣硬、壓痛，前置胎盤子宮柔軟、無壓痛。"
+        });
+        // 題目179
+        fullQuestionBank.push({
+            question: "179. 產後出血的定義為胎兒娩出後24小時內出血量超過？",
+            options: ["300ml", "500ml", "800ml", "1000ml"],
+            correct: 1,
+            explanation: "陰道分娩後24小時出血量≥500ml，剖宮產≥1000ml，診斷產後出血。"
+        });
+        // 題目180
+        fullQuestionBank.push({
+            question: "180. 新生兒窒息的復甦程序，最先進行的步驟是？",
+            options: ["保暖", "清理呼吸道", "觸覺刺激", "正壓通氣"],
+            correct: 1,
+            explanation: "復甦程序：保暖→清理呼吸道→觸覺刺激→正壓通氣等。"
+        });
+        // 題目181
+        fullQuestionBank.push({
+            question: "181. 子宮收縮乏力導致產後出血，首選藥物為？",
+            options: ["麥角新鹼", "縮宮素", "前列腺素", "米索前列醇"],
+            correct: 1,
+            explanation: "縮宮素（Oxytocin·葡: Ocitocina）是預防和治療產後出血的一線用藥，作用快。"
+        });
+        // 題目182
+        fullQuestionBank.push({
+            question: "182. 早產兒易出現新生兒硬腫症，與哪種因素有關？",
+            options: ["皮下脂肪少", "棕色脂肪少", "體表面積大", "寒冷"],
+            correct: 1,
+            explanation: "早產兒棕色脂肪少，產熱不足，在寒冷時易發生硬腫症。"
+        });
+        // 題目183
+        fullQuestionBank.push({
+            question: "183. 哺乳期婦女，乳頭皸裂的處理錯誤的是？",
+            options: ["繼續哺乳，先餵健側", "哺乳後擠少許乳汁塗抹", "暫停哺乳，用吸奶器吸出", "塗抗生素軟膏後立即哺乳"],
+            correct: 3,
+            explanation: "塗藥後哺乳可能使嬰兒吸入藥物，應哺乳前清洗或哺乳後用藥。"
+        });
+        // 題目184
+        fullQuestionBank.push({
+            question: "184. 子宮肌瘤最常見的類型為？",
+            options: ["漿膜下肌瘤", "肌壁間肌瘤", "黏膜下肌瘤", "闊韌帶肌瘤"],
+            correct: 1,
+            explanation: "肌壁間肌瘤最常見，占60-70%。"
+        });
+        // 題目185
+        fullQuestionBank.push({
+            question: "185. 葡萄胎病人清宮術後，最重要的隨訪項目是？",
+            options: ["B超", "HCG測定", "婦科檢查", "X線胸片"],
+            correct: 1,
+            explanation: "葡萄胎後有惡變可能，需定期監測HCG至正常後半年至一年。"
+        });
+        // 題目186
+        fullQuestionBank.push({
+            question: "186. 妊娠合併心臟病，最易發生心衰的時期是？",
+            options: ["妊娠32-34週", "妊娠28-30週", "妊娠20-24週", "產褥期"],
+            correct: 0,
+            explanation: "妊娠32-34週血容量達高峰，心臟負荷最重，易誘發心衰。"
+        });
+        // 題目187
+        fullQuestionBank.push({
+            question: "187. 下列哪項不是宮頸癌的早期症狀？",
+            options: ["接觸性出血", "陰道排液", "絕經後陰道出血", "下肢水腫疼痛"],
+            correct: 3,
+            explanation: "下肢水腫疼痛多為晚期浸潤壓迫症狀。"
+        });
+        // 題目188
+        fullQuestionBank.push({
+            question: "188. 滴蟲性陰道炎病人，典型白帶性狀為？",
+            options: ["白色豆渣樣", "灰黃色泡沫狀稀薄", "膿性", "血性"],
+            correct: 1,
+            explanation: "滴蟲性陰道炎白帶呈灰黃色泡沫狀，有臭味，可伴外陰瘙癢。"
+        });
+        // 題目189
+        fullQuestionBank.push({
+            question: "189. 更年期綜合徵的內分泌變化特點為？",
+            options: ["雌激素下降，促性腺激素上升", "雌激素上升，促性腺激素下降", "孕激素上升", "雄激素上升"],
+            correct: 0,
+            explanation: "卵巢功能衰退，雌激素減少，通過負反饋使FSH、LH升高。"
+        });
+        // 題目190
+        fullQuestionBank.push({
+            question: "190. 口服避孕藥的副作用不包括？",
+            options: ["類早孕反應", "體重增加", "色素沉著", "白帶增多"],
+            correct: 3,
+            explanation: "口服避孕藥可致噁心、體重增加、面部色素斑，但一般不會引起白帶增多。"
+        });
+        // 題目191
+        fullQuestionBank.push({
+            question: "191. 異位妊娠最常發生的部位是？",
+            options: ["輸卵管", "卵巢", "腹腔", "宮頸"],
+            correct: 0,
+            explanation: "輸卵管妊娠最常見，占95%左右，其中壺腹部最常見。"
+        });
+        // 題目192
+        fullQuestionBank.push({
+            question: "192. 產褥期婦女，體溫出現泌乳熱，一般發生在產後？",
+            options: ["12小時內", "24小時內", "3-4天", "7天"],
+            correct: 2,
+            explanation: "產後3-4天泌乳開始，乳房充血腫脹，可引起短暫低熱，不超過38℃。"
+        });
+        // 題目193
+        fullQuestionBank.push({
+            question: "193. 子宮內膜異位症典型的症狀是？",
+            options: ["原發性痛經", "繼發性、進行性加重痛經", "月經紊亂", "不孕"],
+            correct: 1,
+            explanation: "子宮內膜異位症典型表現為繼發性痛經，且逐年加重。"
+        });
+        // 題目194
+        fullQuestionBank.push({
+            question: "194. 新生兒生理性黃疸一般出現在？",
+            options: ["出生後24小時內", "出生後2-3天", "出生後5-7天", "出生後10-14天"],
+            correct: 1,
+            explanation: "生理性黃疸多在生後2-3天出現，4-5天達高峰，足月兒2週內消退。"
+        });
+        // 題目195
+        fullQuestionBank.push({
+            question: "195. 宮內節育器放置的時間，錯誤的是？",
+            options: ["月經乾淨後3-7天", "人工流產術後立即", "自然分娩後42天", "剖宮產術後半年"],
+            correct: 2,
+            explanation: "自然分娩後一般滿3個月，剖宮產後半年放置；產褥期（42天）子宮未完全恢復，不宜放置。"
+        });
+        // 題目196
+        fullQuestionBank.push({
+            question: "196. 嬰兒開始添加蛋黃的年齡一般是？",
+            options: ["1-2個月", "4-6個月", "7-9個月", "10-12個月"],
+            correct: 1,
+            explanation: "嬰兒4-6個月可添加蛋黃（從1/4個開始），以補充鐵質。"
+        });
+        // 題目197
+        fullQuestionBank.push({
+            question: "197. 小兒體溫測量，肛溫正常範圍為？",
+            options: ["36.0-37.0℃", "36.5-37.5℃", "37.5-38.0℃", "36.0-37.5℃"],
+            correct: 3,
+            explanation: "肛溫較口溫高0.3-0.5℃，正常範圍36.0-37.5℃。"
+        });
+        // 題目198
+        fullQuestionBank.push({
+            question: "198. 小兒急性喉炎易發生呼吸困難的原因不包括？",
+            options: ["喉腔狹小", "黏膜下組織疏鬆", "咳嗽反射弱", "喉軟骨柔軟"],
+            correct: 2,
+            explanation: "小兒喉腔狹小、黏膜疏鬆易水腫、軟骨柔軟易塌陷，但咳嗽反射不弱。"
+        });
+        // 題目199
+        fullQuestionBank.push({
+            question: "199. 新生兒沐浴時，室溫應保持在？",
+            options: ["20-22℃", "24-26℃", "26-28℃", "28-30℃"],
+            correct: 2,
+            explanation: "新生兒沐浴室溫26-28℃，水溫38-40℃。"
+        });
+        // 題目200
+        fullQuestionBank.push({
+            question: "200. 小兒支氣管肺炎合併心衰，首要處理是？",
+            options: ["吸氧", "鎮靜", "強心利尿", "止咳"],
+            correct: 2,
+            explanation: "心衰時需立即強心（西地蘭）、利尿（呋塞米），減輕心臟負荷。"
+        });
+        // 題目201
+        fullQuestionBank.push({
+            question: "201. 小兒腹瀉脫水，第1天補液總量包括？",
+            options: ["累積損失量+繼續損失量", "累積損失量+繼續損失量+生理需要量", "繼續損失量+生理需要量", "累積損失量+生理需要量"],
+            correct: 1,
+            explanation: "第1天補液總量包括累積損失量、繼續損失量、生理需要量。"
+        });
+        // 題目202
+        fullQuestionBank.push({
+            question: "202. 新生兒臍帶護理，錯誤的是？",
+            options: ["保持清潔乾燥", "用75%酒精消毒", "尿布不可蓋過臍部", "發現滲血立即用雲南白藥覆蓋"],
+            correct: 3,
+            explanation: "臍部滲血應重新結紮或壓迫止血，不宜用粉劑覆蓋，以免感染。"
+        });
+        // 題目203
+        fullQuestionBank.push({
+            question: "203. 小兒營養不良最早的臨床表現為？",
+            options: ["體重不增", "皮下脂肪減少", "身高落後", "精神萎靡"],
+            correct: 0,
+            explanation: "營養不良最早表現為體重不增或減輕，隨後皮下脂肪減少。"
+        });
+        // 題目204
+        fullQuestionBank.push({
+            question: "204. 維生素D缺乏性佝僂病活動期（激期）的骨骼改變，不包括？",
+            options: ["方顱", "肋骨串珠", "手鐲腳鐲", "脊柱側彎"],
+            correct: 3,
+            explanation: "活動期表現為骨骼改變（方顱、串珠、手足鐲）和運動發育遲緩，脊柱側彎多為後遺症。"
+        });
+        // 題目205
+        fullQuestionBank.push({
+            question: "205. 小兒急性腎小球腎炎典型表現為？",
+            options: ["血尿、水腫、高血壓", "蛋白尿、低蛋白血症、水腫", "尿頻、尿急、尿痛", "發熱、腰痛、膿尿"],
+            correct: 0,
+            explanation: "急性腎小球腎炎以血尿、水腫、高血壓為特徵，多繼發於鏈球菌感染。"
+        });
+        // 題目206
+        fullQuestionBank.push({
+            question: "206. 小兒原發性肺結核最常見的類型是？",
+            options: ["原發綜合徵", "粟粒性肺結核", "浸潤性肺結核", "結核性胸膜炎"],
+            correct: 0,
+            explanation: "原發綜合徵（原發灶、淋巴管炎、肺門淋巴結腫大）是小兒原發性肺結核最常見類型。"
+        });
+        // 題目207
+        fullQuestionBank.push({
+            question: "207. 新生兒缺氧缺血性腦病，控制驚厥首選藥物為？",
+            options: ["地西泮", "苯巴比妥", "水合氯醛", "苯妥英鈉"],
+            correct: 1,
+            explanation: "苯巴比妥（Phenobarbital·葡: Fenobarbital）是新生兒驚厥首選，負荷量20mg/kg。"
+        });
+        // 題目208
+        fullQuestionBank.push({
+            question: "208. 小兒麻疹的隔離期為？",
+            options: ["出疹前後各5天", "出疹前後各10天", "出疹後5天", "出疹後10天"],
+            correct: 0,
+            explanation: "麻疹隔離期一般為出疹前5天至出疹後5天，合併肺炎者延長至出疹後10天。"
+        });
+        // 題目209
+        fullQuestionBank.push({
+            question: "209. 小兒水痘皮疹的分佈特點為？",
+            options: ["向心性分佈", "離心性分佈", "沿神經分佈", "全身對稱"],
+            correct: 0,
+            explanation: "水痘皮疹以軀幹多、四肢少，呈向心性分佈。"
+        });
+        // 題目210
+        fullQuestionBank.push({
+            question: "210. 小兒驚厥時，首要護理措施為？",
+            options: ["立即止驚", "保持呼吸道通暢", "吸氧", "降溫"],
+            correct: 1,
+            explanation: "驚厥時首要保持呼吸道通暢，防止窒息，再行止驚、給氧等。"
+        });
+        // 題目211
+        fullQuestionBank.push({
+            question: "211. 新生兒寒冷損傷症候群（新生兒硬腫症）復溫的原則是？",
+            options: ["快速復溫", "緩慢復溫", "溫水浴", "輻射台加熱"],
+            correct: 1,
+            explanation: "應緩慢復溫（每小時升高0.5-1℃），避免快速升溫引起心肺功能惡化。"
+        });
+        // 題目212
+        fullQuestionBank.push({
+            question: "212. 小兒先天性心臟病最常見的類型是？",
+            options: ["房間隔缺損", "室間隔缺損", "動脈導管未閉", "法洛四聯症"],
+            correct: 1,
+            explanation: "室間隔缺損是最常見的先天性心臟病，約占25%。"
+        });
+        // 題目213
+        fullQuestionBank.push({
+            question: "213. 小兒口服補液鹽（ORS）適用於？",
+            options: ["輕中度脫水無嚴重嘔吐", "重度脫水", "休克", "新生兒腹瀉"],
+            correct: 0,
+            explanation: "ORS適用於預防和糾正輕中度脫水，但嚴重嘔吐、重度脫水、新生兒慎用。"
+        });
+        // 題目214
+        fullQuestionBank.push({
+            question: "214. 小兒化膿性腦膜炎最常見的致病菌是？",
+            options: ["腦膜炎雙球菌", "流感嗜血桿菌", "肺炎鏈球菌", "金黃色葡萄球菌"],
+            correct: 2,
+            explanation: "各年齡段不同，新生兒及嬰兒以肺炎鏈球菌、B族鏈球菌多見，年長兒以腦膜炎球菌、肺炎鏈球菌多見。"
+        });
+        // 題目215
+        fullQuestionBank.push({
+            question: "215. 小兒腎病綜合徵最突出的表現是？",
+            options: ["大量蛋白尿", "低蛋白血症", "高度水腫", "高膽固醇血症"],
+            correct: 0,
+            explanation: "大量蛋白尿（＞50mg/kg/d）是診斷腎病綜合徵的必要條件。"
+        });
+        // 題目216
+        fullQuestionBank.push({
+            question: "216. 下列哪種藥物可透過胎盤，孕婦禁用？",
+            options: ["青黴素", "頭孢菌素", "鏈黴素", "紅黴素"],
+            correct: 2,
+            explanation: "鏈黴素（Streptomycin·葡: Estreptomicina）屬氨基糖苷類，可損害胎兒第八對腦神經，致先天性耳聾。"
+        });
+        // 題目217
+        fullQuestionBank.push({
+            question: "217. 使用肝素過量引起出血，特異性解毒劑為？",
+            options: ["維生素K1", "魚精蛋白", "氨甲環酸", "酚磺乙胺"],
+            correct: 1,
+            explanation: "魚精蛋白（Protamine·葡: Protamina）可與肝素結合形成穩定複合物，中和其抗凝作用。"
+        });
+        // 題目218
+        fullQuestionBank.push({
+            question: "218. 下列哪種藥物主要用於治療癲癇持續狀態？",
+            options: ["丙戊酸鈉", "卡馬西平", "地西泮靜脈注射", "苯妥英鈉口服"],
+            correct: 2,
+            explanation: "地西泮（Diazepam·葡: Diazepam）靜脈注射是控制癲癇持續狀態的首選藥物。"
+        });
+        // 題目219
+        fullQuestionBank.push({
+            question: "219. 糖皮質激素（如潑尼松）的不良反應不包括？",
+            options: ["向心性肥胖", "骨質疏鬆", "高血鉀", "血糖升高"],
+            correct: 2,
+            explanation: "糖皮質激素有保鈉排鉀作用，可致水鈉潴留、低血鉀，而非高血鉀。"
+        });
+        // 題目220
+        fullQuestionBank.push({
+            question: "220. 使用阿托品治療有機磷中毒時，「阿托品化」的指標不包括？",
+            options: ["瞳孔較前縮小", "顏面潮紅", "口乾、皮膚乾燥", "心率加快"],
+            correct: 0,
+            explanation: "阿托品化表現為瞳孔散大（而非縮小）、顏面潮紅、口乾、皮膚乾燥、心率加快、肺部囉音減少。"
+        });
+        // 題目221
+        fullQuestionBank.push({
+            question: "221. 下列哪種藥物不宜與氨基糖苷類合用，以免加重呼吸抑制？",
+            options: ["青黴素", "頭孢菌素", "骨骼肌鬆弛劑", "紅黴素"],
+            correct: 2,
+            explanation: "氨基糖苷類（如慶大黴素）有神經肌肉阻斷作用，與骨骼肌鬆弛劑合用可加重呼吸抑制。"
+        });
+        // 題目222
+        fullQuestionBank.push({
+            question: "222. 硝酸甘油舌下含服的生物利用度比口服高的原因是？",
+            options: ["肝首過消除", "胃酸破壞", "腸道吸收差", "腎排泄快"],
+            correct: 0,
+            explanation: "口服硝酸甘油經肝臟首過消除，絕大部分被代謝；舌下含服直接吸收入血，避免首過效應。"
+        });
+        // 題目223
+        fullQuestionBank.push({
+            question: "223. 下列哪種利尿劑作用最強，常用於急性肺水腫？",
+            options: ["氫氯噻嗪", "呋塞米", "螺內酯", "氨苯蝶啶"],
+            correct: 1,
+            explanation: "呋塞米（Furosemide·葡: Furosemida）為高效能利尿劑，靜脈注射可迅速利尿，擴張靜脈，降低心臟前負荷。"
+        });
+        // 題目224
+        fullQuestionBank.push({
+            question: "224. 化療藥物甲氨蝶呤（Methotrexate）的解毒劑是？",
+            options: ["亞葉酸鈣", "美司鈉", "碳酸氫鈉", "別嘌醇"],
+            correct: 0,
+            explanation: "亞葉酸鈣（Calcium folinate）可解救甲氨蝶呤引起的骨髓抑制，提供還原型葉酸。"
+        });
+        // 題目225
+        fullQuestionBank.push({
+            question: "225. 普萘洛爾（Propranolol）的禁忌症不包括？",
+            options: ["支氣管哮喘", "心動過緩", "高血壓", "房室傳導阻滯"],
+            correct: 2,
+            explanation: "普萘洛爾為非選擇性β阻斷劑，可用於高血壓，但禁於哮喘、心衰、傳導阻滯等。"
+        });
+        // 題目226
+        fullQuestionBank.push({
+            question: "226. 下列哪種藥物是治療滴蟲性陰道炎的首選？",
+            options: ["甲硝唑", "克黴唑", "制黴菌素", "伊曲康唑"],
+            correct: 0,
+            explanation: "甲硝唑（Metronidazole·葡: Metronidazol）對滴蟲、厭氧菌有效，口服或陰道給藥。"
+        });
+        // 題目227
+        fullQuestionBank.push({
+            question: "227. 使用異煙肼（Isoniazid）時，應常規補充維生素B6，其目的是？",
+            options: ["預防周圍神經炎", "預防肝損害", "增強療效", "減少過敏反應"],
+            correct: 0,
+            explanation: "異煙肼可競爭性抑制維生素B6利用，導致周圍神經炎，補充B6可預防。"
+        });
+        // 題目228
+        fullQuestionBank.push({
+            question: "228. 下列哪種藥物可引起「灰嬰症候群」，禁用於新生兒？",
+            options: ["氯黴素", "四環素", "磺胺類", "喹諾酮類"],
+            correct: 0,
+            explanation: "氯黴素（Chloramphenicol·葡: Cloranfenicol）在新生兒體內葡萄糖醛酸轉移酶不足，易蓄積中毒，致心血管虛脫（灰嬰症）。"
+        });
+        // 題目229
+        fullQuestionBank.push({
+            question: "229. 治療心絞痛時，硝苯地平與普萘洛爾合用，可協同增效並抵消哪種副作用？",
+            options: ["硝苯地平的反射性心動過速", "普萘洛爾的支氣管痙攣", "硝苯地平的低血壓", "普萘洛爾的抑制心肌"],
+            correct: 0,
+            explanation: "硝苯地平擴血管引起反射性心動過速，普萘洛爾減慢心率，二者合用可相互抵消。"
+        });
+        // 題目230
+        fullQuestionBank.push({
+            question: "230. 下列哪種藥物是急救車必備的強心藥？",
+            options: ["去乙醯毛花苷（西地蘭）", "多巴胺", "腎上腺素", "阿托品"],
+            correct: 2,
+            explanation: "腎上腺素（Adrenalina）是心肺復甦的首選藥，用於心臟驟停、過敏性休克等。"
+        });
+        // 題目231
+        fullQuestionBank.push({
+            question: "231. 使用環孢素（Ciclosporin）的器官移植病人，應監測？",
+            options: ["血藥濃度", "肝功能", "腎功能", "以上皆是"],
+            correct: 3,
+            explanation: "環孢素治療窗窄，有腎毒性、肝毒性、高血壓等，需監測血藥濃度及肝腎功能。"
+        });
+        // 題目232
+        fullQuestionBank.push({
+            question: "232. 下列哪種藥物不能用於青光眼？",
+            options: ["毛果芸香鹼", "噻嗎洛爾", "阿托品", "拉坦前列素"],
+            correct: 2,
+            explanation: "阿托品（Atropina）擴瞳、升高眼壓，禁用於窄角型青光眼。"
+        });
+        // 題目233
+        fullQuestionBank.push({
+            question: "233. 治療支氣管哮喘急性發作，下列哪種藥物起效最快？",
+            options: ["沙丁胺醇吸入", "氨茶鹼口服", "布地奈德吸入", "孟魯司特口服"],
+            correct: 0,
+            explanation: "沙丁胺醇（Salbutamol·葡: Salbutamol）為短效β2激動劑，吸入後數分鐘起效。"
+        });
+        // 題目234
+        fullQuestionBank.push({
+            question: "234. 下列哪種抗生素與酒精同服可引起「雙硫侖樣反應」？",
+            options: ["頭孢哌酮", "青黴素", "阿奇黴素", "克林黴素"],
+            correct: 0,
+            explanation: "頭孢哌酮（Cefoperazona）等含甲硫四氮唑側鏈的頭孢類，抑制乙醛脫氫酶，飲酒後致乙醛蓄積。"
+        });
+        // 題目235
+        fullQuestionBank.push({
+            question: "235. 碳酸氫鈉用於治療代謝性酸中毒，過量可致？",
+            options: ["呼吸性酸中毒", "代謝性鹼中毒", "低血鉀", "高血鈣"],
+            correct: 1,
+            explanation: "碳酸氫鈉過量可致醫源性代謝性鹼中毒，引起低鉀、心律失常。"
+        });
+        // 題目236
+        fullQuestionBank.push({
+            question: "236. 治療高血鉀的措施中，可促進鉀離子向細胞內轉移的是？",
+            options: ["葡萄糖酸鈣", "胰島素+葡萄糖", "呋塞米", "聚磺苯乙烯"],
+            correct: 1,
+            explanation: "胰島素促進細胞攝取葡萄糖的同時，使鉀離子進入細胞內，降低血鉀。"
+        });
+        // 題目237
+        fullQuestionBank.push({
+            question: "237. 下列哪種藥物可引起耳毒性（耳鳴、聽力減退）？",
+            options: ["呋塞米", "依他尼酸", "氨基糖苷類", "以上皆是"],
+            correct: 3,
+            explanation: "呋塞米、依他尼酸（利尿酸）、氨基糖苷類均有耳毒性。"
+        });
+        // 題目238
+        fullQuestionBank.push({
+            question: "238. 他汀類藥物（如阿托伐他汀）主要不良反應為？",
+            options: ["肌肉毒性", "肝毒性", "胃腸反應", "腎毒性"],
+            correct: 0,
+            explanation: "他汀類可致肌肉酸痛、肌酸激酶升高，嚴重時橫紋肌溶解。"
+        });
+        // 題目239
+        fullQuestionBank.push({
+            question: "239. 使用嗎啡止痛時，最需注意的副作用是？",
+            options: ["噁心嘔吐", "便秘", "呼吸抑制", "尿潴留"],
+            correct: 2,
+            explanation: "嗎啡（Morfina）可抑制呼吸中樞，尤其劑量過大或與其他鎮靜藥合用時危險。"
+        });
+        // 題目240
+        fullQuestionBank.push({
+            question: "240. 下列哪種藥物屬於長效胰島素類似物，作用持續24小時？",
+            options: ["賴脯胰島素", "門冬胰島素", "甘精胰島素", "常規胰島素"],
+            correct: 2,
+            explanation: "甘精胰島素（Glargina）為長效，每日一次，無峰值。"
+        });
+        // 題目241
+        fullQuestionBank.push({
+            question: "241. 治療帕金森病，下列哪種藥物可通過血腦屏障轉化為多巴胺？",
+            options: ["左旋多巴", "卡比多巴", "司來吉蘭", "溴隱亭"],
+            correct: 0,
+            explanation: "左旋多巴（Levodopa）為多巴胺前體，可入腦轉化為多巴胺，補充不足。"
+        });
+        // 題目242
+        fullQuestionBank.push({
+            question: "242. 使用氯吡格雷（Clopidogrel）抗血小板時，其活性代謝依賴的肝藥酶為？",
+            options: ["CYP2C19", "CYP3A4", "CYP2D6", "CYP1A2"],
+            correct: 0,
+            explanation: "氯吡格雷為前藥，需經CYP2C19代謝為活性產物，基因多態性影響療效。"
+        });
+        // 題目243
+        fullQuestionBank.push({
+            question: "243. 下列哪種藥物可引起刺激性乾咳，需與止咳藥聯用？",
+            options: ["卡託普利", "硝苯地平", "氯沙坦", "氫氯噻嗪"],
+            correct: 0,
+            explanation: "ACEI類（如卡託普利Captopril·葡: Captopril）抑制緩激肽降解，致乾咳。"
+        });
+        // 題目244
+        fullQuestionBank.push({
+            question: "244. 萬古黴素（Vancomycin）靜脈滴注過快可引起？",
+            options: ["紅人症候群", "灰嬰症候群", "棕色瓶症候群", "藍嬰症候群"],
+            correct: 0,
+            explanation: "萬古黴素滴注過快可致組胺釋放，引起顏面、頸部、上身潮紅（紅人症候群）。"
+        });
+        // 題目245
+        fullQuestionBank.push({
+            question: "245. 下列哪種抗癲癇藥物對失神發作（小發作）療效最好？",
+            options: ["乙琥胺", "苯妥英鈉", "卡馬西平", "苯巴比妥"],
+            correct: 0,
+            explanation: "乙琥胺（Ethosuximide·葡: Etossuximida）對失神發作首選，對其他類型無效。"
+        });
+        // 題目246
+        fullQuestionBank.push({
+            question: "246. 院外心臟驟停，急救生存鏈的第一個環節是？",
+            options: ["早期除顫", "早期CPR", "早期識別與呼救", "高級生命支持"],
+            correct: 2,
+            explanation: "生存鏈：早期識別呼救→早期CPR→早期除顫→早期高級生命支持→整合復甦後治療。"
+        });
+        // 題目247
+        fullQuestionBank.push({
+            question: "247. 氣管插管時，確認導管在氣管內最可靠的方法為？",
+            options: ["聽診雙肺呼吸音", "觀察胸廓起伏", "呼氣末二氧化碳監測", "纖支鏡"],
+            correct: 2,
+            explanation: "呼氣末二氧化碳監測（波形）是確認氣管內插管的金標準。"
+        });
+        // 題目248
+        fullQuestionBank.push({
+            question: "248. 急性呼吸窘迫症候群（ARDS）的病理生理核心為？",
+            options: ["肺水腫", "肺泡萎陷", "肺內分流增加", "肺順應性降低"],
+            correct: 2,
+            explanation: "ARDS因肺泡滲出、萎陷，導致通氣/血流比例失調，肺內分流增加，頑固性低氧血症。"
+        });
+        // 題目249
+        fullQuestionBank.push({
+            question: "249. 多器官功能障礙症候群（MODS）最常見的啟動因素是？",
+            options: ["嚴重感染", "創傷", "休克", "胰腺炎"],
+            correct: 0,
+            explanation: "嚴重感染（膿毒症）是MODS最常見的啟動因素。"
+        });
+        // 題目250
+        fullQuestionBank.push({
+            question: "250. 高血壓危象病人，降壓應遵循的原則是？",
+            options: ["迅速降至正常", "在數分鐘內降至安全範圍", "2-6小時內降至160/100mmHg", "24小時內降至目標值"],
+            correct: 2,
+            explanation: "高血壓危象需在2-6小時內將血壓降至160/100mmHg，避免快速降壓導致腦缺血。"
+        });
+        // 題目251
+        fullQuestionBank.push({
+            question: "251. 熱射病（中暑高熱）病人，快速降溫的首選措施為？",
+            options: ["冰水浸浴", "冰帽", "輸注冷鹽水", "藥物降溫"],
+            correct: 0,
+            explanation: "冰水浸浴或擦拭是最有效的物理降溫方法，使核心溫度在10-40分鐘內降至39℃以下。"
+        });
+        // 題目252
+        fullQuestionBank.push({
+            question: "252. 溺水病人急救時，首要步驟為？",
+            options: ["控水（倒水）", "人工呼吸", "胸外按壓", "清理呼吸道"],
+            correct: 3,
+            explanation: "立即清理口鼻異物，開放氣道，然後進行人工呼吸和按壓，不建議常規控水。"
+        });
+        // 題目253
+        fullQuestionBank.push({
+            question: "253. 急性有機磷中毒病人，出現肌束震顫、呼吸肌麻痺，主要因為？",
+            options: ["膽鹼能危象", "中間型症候群", "遲發性神經病", "阿托品過量"],
+            correct: 1,
+            explanation: "中間型症候群發生在急性中毒後1-4天，表現為肌無力，特別是呼吸肌，與乙醯膽鹼酯酶老化有關。"
+        });
+        // 題目254
+        fullQuestionBank.push({
+            question: "254. 使用硝普鈉（Sodium nitroprusside）降壓時，最需注意的毒性是？",
+            options: ["高鐵血紅蛋白血症", "氰化物中毒", "低血壓", "心動過速"],
+            correct: 1,
+            explanation: "硝普鈉代謝產生氰化物，長期或大劑量使用可致氰化物中毒，表現為代謝性酸中毒、意識障礙。"
+        });
+        // 題目255
+        fullQuestionBank.push({
+            question: "255. 急性中毒病人，洗胃的禁忌症不包括？",
+            options: ["驚厥未控制", "強腐蝕劑中毒", "服毒超過6小時", "有食管靜脈曲張"],
+            correct: 2,
+            explanation: "服毒超過6小時，若毒物仍大量在胃內（如抗膽鹼能藥物延緩胃排空），仍可洗胃。"
+        });
+        // 題目256
+        fullQuestionBank.push({
+            question: "256. 緊急氣道開放的方法，最簡單有效的是？",
+            options: ["口咽通氣管", "仰頭抬頦法", "託下頜法", "環甲膜穿刺"],
+            correct: 1,
+            explanation: "無器械時仰頭抬頦法是開放氣道最簡單有效的方法。"
+        });
+        // 題目257
+        fullQuestionBank.push({
+            question: "257. 肺栓塞溶栓治療的絕對禁忌症為？",
+            options: ["近期大手術", "活動性內臟出血", "高血壓", "腦卒中病史"],
+            correct: 1,
+            explanation: "活動性出血是溶栓的絕對禁忌；近期手術、腦卒中為相對禁忌。"
+        });
+        // 題目258
+        fullQuestionBank.push({
+            question: "258. 創傷病人評估中，按照ABCDE順序，「C」代表？",
+            options: ["循環", "頸椎", "意識", "呼吸"],
+            correct: 0,
+            explanation: "ABCDE：氣道（A）、呼吸（B）、循環（C）、神經功能（D）、暴露/環境（E）。"
+        });
+        // 題目259
+        fullQuestionBank.push({
+            question: "259. 顱內壓增高的病人，應避免何種操作？",
+            options: ["吸痰前過度刺激", "抬高床頭", "保持大便通暢", "過度通氣"],
+            correct: 0,
+            explanation: "吸痰前過度刺激可引起嗆咳，使顱內壓驟升，應預先給氧、輕柔操作。"
+        });
+        // 題目260
+        fullQuestionBank.push({
+            question: "260. 急性心肌梗死病人出現室顫，非同步電除顫的初始能量選擇？",
+            options: ["50J", "100J", "200J（雙相波）", "360J（單相波）"],
+            correct: 2,
+            explanation: "雙相波除顫首次能量120-200J，單相波360J。"
+        });
+        // 題目261
+        fullQuestionBank.push({
+            question: "261. 糖尿病酮症酸中毒病人，補液首選？",
+            options: ["0.45%鹽水", "0.9%鹽水", "5%葡萄糖", "林格氏液"],
+            correct: 1,
+            explanation: "先快後慢輸注0.9%生理鹽水，糾正脫水，血糖降至13.9mmol/L後改用5%葡萄糖+胰島素。"
+        });
+        // 題目262
+        fullQuestionBank.push({
+            question: "262. 過敏性休克病人，首選肌肉注射腎上腺素的部位為？",
+            options: ["三角肌", "大腿外側（股外側肌）", "臀大肌", "腹部"],
+            correct: 1,
+            explanation: "大腿外側肌群（股外側肌）吸收快，是過敏性休克腎上腺素注射首選部位。"
+        });
+        // 題目263
+        fullQuestionBank.push({
+            question: "263. 嚴重創傷病人出現「死亡三聯徵」指？",
+            options: ["低體溫、酸中毒、凝血障礙", "低血壓、呼吸困難、意識障礙", "感染、休克、多器官衰竭", "高血糖、高血鉀、高體溫"],
+            correct: 0,
+            explanation: "低體溫、酸中毒、凝血障礙互為因果，形成死亡三角。"
+        });
+        // 題目264
+        fullQuestionBank.push({
+            question: "264. 急性中毒病人，促進已吸收毒物排泄的方法不包括？",
+            options: ["強力利尿", "血液透析", "洗胃", "改變尿液pH"],
+            correct: 2,
+            explanation: "洗胃是清除胃內未吸收毒物，不能促進已吸收毒物排泄。"
+        });
+        // 題目265
+        fullQuestionBank.push({
+            question: "265. 使用呼吸機病人，出現人機對抗，不當的處理是？",
+            options: ["檢查氣道通暢", "調整模式參數", "使用鎮靜劑", "立即斷開呼吸機"],
+            correct: 3,
+            explanation: "人機對抗應分析原因（痰堵、參數不當、疼痛等），對因處理，不可盲目斷開。"
+        });
+        // 題目266
+        fullQuestionBank.push({
+            question: "266. 精神分裂症患者出現「被動服從」，屬於何種症狀？",
+            options: ["幻覺", "妄想", "思維障礙", "意志行為障礙"],
+            correct: 3,
+            explanation: "被動服從（機械性順從）是緊張症候群的表現，屬意志行為障礙。"
+        });
+        // 題目267
+        fullQuestionBank.push({
+            question: "267. 下列哪種抗精神病藥引起錐體外系反應最輕？",
+            options: ["氯丙嗪", "氟哌啶醇", "氯氮平", "奮乃靜"],
+            correct: 2,
+            explanation: "氯氮平（Clozapina）屬非典型抗精神病藥，幾乎無錐體外系反應。"
+        });
+        // 題目268
+        fullQuestionBank.push({
+            question: "268. 抑鬱症病人晨重暮輕的變化，護士應重點關注？",
+            options: ["夜間巡視", "清晨自殺風險", "午間活動", "晚餐進食"],
+            correct: 1,
+            explanation: "抑鬱症病人清晨情緒最低落，自殺風險高，需加強防範。"
+        });
+        // 題目269
+        fullQuestionBank.push({
+            question: "269. 躁狂症病人急性期，護理環境宜？",
+            options: ["色彩鮮艷", "安靜簡單", "熱鬧有活動", "約束保護"],
+            correct: 1,
+            explanation: "安靜、簡單、低刺激的環境有助於減少躁狂發作。"
+        });
+        // 題目270
+        fullQuestionBank.push({
+            question: "270. 使用碳酸鋰（Lithium carbonate）期間，病人出現噁心、嘔吐、手抖，首要處理為？",
+            options: ["停藥並測血鋰濃度", "加用止吐藥", "減少劑量", "補液"],
+            correct: 0,
+            explanation: "出現中毒早期症狀，應立即停藥，抽血測血鋰濃度。"
+        });
+        // 題目271
+        fullQuestionBank.push({
+            question: "271. 下列哪項不是強迫症的典型表現？",
+            options: ["反覆洗手", "反覆檢查門窗", "明知不合理但無法控制", "思維鬆弛"],
+            correct: 3,
+            explanation: "思維鬆弛是精神分裂症的特徵。強迫症表現為強迫觀念和強迫行為。"
+        });
+        // 題目272
+        fullQuestionBank.push({
+            question: "272. 電抽搐治療（ECT）後，病人最常見的近期記憶障礙為？",
+            options: ["遠期遺忘", "順行性遺忘", "逆行性遺忘", "選擇性遺忘"],
+            correct: 2,
+            explanation: "ECT後常出現逆行性遺忘（對治療前近期事件遺忘），多在數週內恢復。"
+        });
+        // 題目273
+        fullQuestionBank.push({
+            question: "273. 酒精依賴病人，戒斷時出現震顫譫妄，特徵性表現為？",
+            options: ["幻覺、定向障礙、震顫", "妄想、興奮", "意識清晰", "情緒低落"],
+            correct: 0,
+            explanation: "震顫譫妄以意識模糊、震顫、幻覺、自主神經亢進為特徵。"
+        });
+        // 題目274
+        fullQuestionBank.push({
+            question: "274. 下列哪種藥物是治療廣泛性焦慮症的一線用藥？",
+            options: ["地西泮", "帕羅西汀", "丁螺環酮", "普萘洛爾"],
+            correct: 1,
+            explanation: "SSRI類（帕羅西汀、舍曲林）是焦慮症長期治療首選，苯二氮䓬類短期使用。"
+        });
+        // 題目275
+        fullQuestionBank.push({
+            question: "275. 護士與精神病人溝通時，下列哪項不當？",
+            options: ["真誠尊重", "反駁病人的妄想內容", "耐心傾聽", "保持適當距離"],
+            correct: 1,
+            explanation: "對妄想病人不宜直接反駁，應保持中立，建立信任關係。"
+        });
+        // 題目276
+        fullQuestionBank.push({
+            question: "276. 氯氮平最需監測的致命不良反應為？",
+            options: ["粒細胞缺乏", "心肌炎", "癲癇", "體重增加"],
+            correct: 0,
+            explanation: "氯氮平可致粒細胞缺乏（1-2%），需定期監測血常規。"
+        });
+        // 題目277
+        fullQuestionBank.push({
+            question: "277. 精神分裂症患者出現「空氣枕頭」體徵，提示？",
+            options: ["緊張症", "幻視", "被害妄想", "抑鬱"],
+            correct: 0,
+            explanation: "空氣枕頭（病人頭下無枕卻保持枕頭姿勢）是緊張症的木僵表現。"
+        });
+        // 題目278
+        fullQuestionBank.push({
+            question: "278. 選擇性5-羥色胺再攝取抑制劑（SSRI）的常見副作用為？",
+            options: ["口乾便秘", "嗜睡", "性功能障礙", "錐體外系反應"],
+            correct: 2,
+            explanation: "SSRI類常見胃腸道反應、失眠或嗜睡、性功能障礙。"
+        });
+        // 題目279
+        fullQuestionBank.push({
+            question: "279. 下列哪項不是抗精神病藥惡性症候群的表現？",
+            options: ["高熱", "肌肉強直", "意識障礙", "瞳孔縮小"],
+            correct: 3,
+            explanation: "惡性症候群表現為高熱、肌強直、意識障礙、自主神經紊亂，瞳孔多散大。"
+        });
+        // 題目280
+        fullQuestionBank.push({
+            question: "280. 對有自殺企圖的病人，護理措施錯誤的是？",
+            options: ["允許病人獨處", "移除危險物品", "鼓勵表達感受", "簽署不自殺契約"],
+            correct: 0,
+            explanation: "自殺高危病人需嚴密監護，不可獨處。"
+        });
+        // 題目281
+        fullQuestionBank.push({
+            question: "281. 社區衛生服務的中心任務是？",
+            options: ["疾病治療", "預防保健", "康復護理", "臨終關懷"],
+            correct: 1,
+            explanation: "社區衛生以預防保健、健康教育為核心，促進人群健康。"
+        });
+        // 題目282
+        fullQuestionBank.push({
+            question: "282. 下列哪項屬於乙類傳染病，但按甲類管理？",
+            options: ["肺炭疽", "艾滋病", "肺結核", "麻疹"],
+            correct: 0,
+            explanation: "肺炭疽、傳染性非典型肺炎、脊髓灰質炎等按甲類管理。"
+        });
+        // 題目283
+        fullQuestionBank.push({
+            question: "283. 老年痴呆症病人，家庭護理重點不包括？",
+            options: ["安全防護", "認知訓練", "約束四肢防止走失", "規律作息"],
+            correct: 2,
+            explanation: "約束會增加恐懼和躁動，應以環境改造、陪伴為主。"
+        });
+        // 題目284
+        fullQuestionBank.push({
+            question: "284. 家庭訪視時，發現新生兒黃疸，首先應評估？",
+            options: ["黃疸出現時間", "體溫", "餵養情況", "臍部"],
+            correct: 0,
+            explanation: "出現時間對鑑別生理性或病理性黃疸至關重要（24小時內出現多為病理）。"
+        });
+        // 題目285
+        fullQuestionBank.push({
+            question: "285. 社區護士進行健康教育時，使用「賦權」模式的核心是？",
+            options: ["灌輸知識", "幫助病人做出選擇", "替代決策", "執行醫囑"],
+            correct: 1,
+            explanation: "賦權是協助個案獲得控制自己健康的能力，自主決策。"
+        });
+        // 題目286
+        fullQuestionBank.push({
+            question: "286. 澳門衛生局規定的強制申報傳染病中，愛滋病應在多久內報告？",
+            options: ["2小時", "24小時", "7天", "1個月"],
+            correct: 1,
+            explanation: "愛滋病為乙類傳染病，24小時內報告。"
+        });
+        // 題目287
+        fullQuestionBank.push({
+            question: "287. 對糖尿病病人進行飲食指導，錯誤的是？",
+            options: ["定時定量", "控制總熱量", "可隨意食用無糖食品", "增加膳食纖維"],
+            correct: 2,
+            explanation: "無糖食品可能含碳水化合物，仍需計算在總熱量內。"
+        });
+        // 題目288
+        fullQuestionBank.push({
+            question: "288. 家庭病床護理中，護士上門服務的內容不包括？",
+            options: ["更換胃管", "傷口換藥", "執行醫囑注射", "處方鎮痛藥"],
+            correct: 3,
+            explanation: "護士無處方權，不可獨立開藥。"
+        });
+        // 題目289
+        fullQuestionBank.push({
+            question: "289. 社區老年人跌倒風險評估，最常用的工具為？",
+            options: ["Morse跌倒評估量表", "Braden量表", "Glasgow量表", "Norton量表"],
+            correct: 0,
+            explanation: "Morse量表用於評估住院病人跌倒風險，也適用於社區老人。"
+        });
+        // 題目290
+        fullQuestionBank.push({
+            question: "290. 澳門醫療體系中，提供初級衛生保健的主要機構是？",
+            options: ["仁伯爵綜合醫院", "衛生中心", "鏡湖醫院", "私家診所"],
+            correct: 1,
+            explanation: "澳門衛生局轄下的衛生中心承擔社區初級衛生保健服務。"
+        });
+        // 題目291
+        fullQuestionBank.push({
+            question: "291. 根據澳門《傳染病防治法》，對甲類傳染病病人應採取？",
+            options: ["強制隔離治療", "居家觀察", "定期追蹤", "無需隔離"],
+            correct: 0,
+            explanation: "甲類傳染病（如霍亂、鼠疫）須強制隔離治療，防止擴散。"
+        });
+        // 題目292
+        fullQuestionBank.push({
+            question: "292. 澳門醫院感染控制中，多重耐藥菌感染病人，隔離標識顏色為？",
+            options: ["藍色", "黃色", "紅色", "綠色"],
+            correct: 2,
+            explanation: "接觸隔離常用紅色標識，飛沫隔離為藍色，空氣隔離為黃色。"
+        });
+        // 題目293
+        fullQuestionBank.push({
+            question: "293. 銳器盒的使用，錯誤的是？",
+            options: ["使用後針頭直接放入", "滿3/4時封口更換", "可重複使用", "嚴禁徒手彎針"],
+            correct: 2,
+            explanation: "銳器盒為一次性使用，不可重複。"
+        });
+        // 題目294
+        fullQuestionBank.push({
+            question: "294. 醫療廢物分類中，廢棄的傳染病人血液、體液應放入？",
+            options: ["黑色垃圾袋", "黃色垃圾袋", "紅色垃圾袋", "專用銳器盒"],
+            correct: 1,
+            explanation: "感染性醫療廢物用黃色垃圾袋。"
+        });
+        // 題目295
+        fullQuestionBank.push({
+            question: "295. 澳門護士持續進修的要求是？",
+            options: ["每年至少15學分", "每3年45學分", "每5年90學分", "無強制要求"],
+            correct: 1,
+            explanation: "澳門護士須每3年完成45學分才能續牌。"
+        });
+        // 題目296
+        fullQuestionBank.push({
+            question: "296. 醫院感染暴發時，應在多久內上報衛生局？",
+            options: ["2小時", "12小時", "24小時", "48小時"],
+            correct: 0,
+            explanation: "疑似感染暴發應立即報告（2小時內），以便調查控制。"
+        });
+        // 題目297
+        fullQuestionBank.push({
+            question: "297. 無菌操作中，無菌包被打濕後應如何處理？",
+            options: ["晾乾後使用", "立即使用", "視為污染，不可再用", "4小時內使用"],
+            correct: 2,
+            explanation: "無菌包一旦潮濕，微生物可透過，視為污染。"
+        });
+        // 題目298
+        fullQuestionBank.push({
+            question: "298. 澳門《個人資料保護法》中，病人病歷屬於？",
+            options: ["一般資料", "敏感資料", "公開資料", "商業資料"],
+            correct: 1,
+            explanation: "健康資料屬敏感個人資料，受嚴格保護。"
+        });
+        // 題目299
+        fullQuestionBank.push({
+            question: "299. 下列哪種情況必須進行手衛生？",
+            options: ["接觸病人前", "接觸病人後", "接觸體液後", "以上皆是"],
+            correct: 3,
+            explanation: "手衛生的5個時刻：接觸前、清潔/無菌操作前、接觸體液後、接觸後、接觸環境後。"
+        });
+        // 題目300
+        fullQuestionBank.push({
+            question: "300. 澳門衛生局護士牌照的有效期為？",
+            options: ["1年", "2年", "3年", "5年"],
+            correct: 2,
+            explanation: "澳門護士執業牌照有效期3年，期滿須換領。"
+        });
+// 題目301
+fullQuestionBank.push({
+    question: "301. 使用胰島素注射筆時，下列哪項操作錯誤？",
+    options: ["注射前搖勻混濁胰島素", "每次更換新針頭", "注射後停留10秒再拔針", "針頭重複使用以節省費用"],
+    correct: 3,
+    explanation: "胰島素針頭為一次性使用，重複使用會增加感染風險、針頭鈍化及劑量不準。"
+});
+
+// 題目302
+fullQuestionBank.push({
+    question: "302. 下列哪種藥物常用於治療骨質疏鬆症？",
+    options: ["阿侖膦酸鈉 (Alendronate)", "布洛芬 (Ibuprofen)", "對乙酰氨基酚 (Paracetamol)", "可待因 (Codeine)"],
+    correct: 0,
+    explanation: "阿侖膦酸鈉 (Alendronato·葡: Alendronato) 為雙膦酸鹽類，抑制破骨細胞，用於骨質疏鬆。"
+});
+
+// 題目303
+fullQuestionBank.push({
+    question: "303. 輸血過程中，病人出現腰背劇痛、血紅蛋白尿，可能為？",
+    options: ["發熱反應", "過敏反應", "溶血反應", "細菌污染反應"],
+    correct: 2,
+    explanation: "溶血反應因紅細胞破壞，釋放血紅蛋白，表現為腰背痛、醬油色尿、寒戰高熱，可致休克。"
+});
+
+// 題目304
+fullQuestionBank.push({
+    question: "304. 下列哪項不是急性胰腺炎的常見病因？",
+    options: ["膽石症", "高血脂", "暴飲暴食", "病毒性感冒"],
+    correct: 3,
+    explanation: "急性胰腺炎常見病因包括膽石症、高血脂、酒精、暴飲暴食、ERCP術後等，病毒性感冒極少引起。"
+});
+
+// 題目305
+fullQuestionBank.push({
+    question: "305. 使用多巴胺時，若劑量為2-5μg/kg/min，其主要作用為？",
+    options: ["興奮多巴胺受體，擴張腎血管", "興奮β1受體，增強心肌收縮力", "興奮α受體，收縮血管", "無明顯作用"],
+    correct: 0,
+    explanation: "小劑量多巴胺 (Dopamina) 主要興奮多巴胺受體，擴張腎、腸繫膜血管，增加尿量。"
+});
+
+// 題目306
+fullQuestionBank.push({
+    question: "306. 兒童熱性驚厥最常見的年齡段是？",
+    options: ["1-6個月", "6個月-3歲", "3-6歲", "6-12歲"],
+    correct: 1,
+    explanation: "熱性驚厥多見於6個月至3歲兒童，與大腦發育不成熟及遺傳有關。"
+});
+
+// 題目307
+fullQuestionBank.push({
+    question: "307. 下列哪種抗心律失常藥物屬於鈉通道阻滯劑（Ⅰ類）？",
+    options: ["利多卡因 (Lidocaine)", "胺碘酮 (Amiodarone)", "索他洛爾 (Sotalol)", "維拉帕米 (Verapamil)"],
+    correct: 0,
+    explanation: "利多卡因 (Lidocaína) 為Ⅰb類鈉通道阻滯劑，用於室性心律失常。"
+});
+
+// 題目308
+fullQuestionBank.push({
+    question: "308. 術後病人出現深靜脈血栓，最嚴重的併發症是？",
+    options: ["肺栓塞", "下肢水腫", "疼痛", "靜脈炎"],
+    correct: 0,
+    explanation: "深靜脈血栓脫落可導致肺栓塞 (Tromboembolia pulmonar)，是致命性併發症。"
+});
+
+// 題目309
+fullQuestionBank.push({
+    question: "309. 下列哪項是糖尿病腎病最早的臨床表現？",
+    options: ["大量蛋白尿", "微量白蛋白尿", "水腫", "高血壓"],
+    correct: 1,
+    explanation: "微量白蛋白尿 (Microalbuminúria) 是糖尿病腎病的早期可逆階段，應積極干預。"
+});
+
+// 題目310
+fullQuestionBank.push({
+    question: "310. 使用阿司匹林預防血栓，常用劑量為？",
+    options: ["75-100mg/日", "300-600mg/日", "1-2g/日", "3-4g/日"],
+    correct: 0,
+    explanation: "阿司匹林 (Ácido acetilsalicílico) 用小劑量（75-100mg/d）抑制血小板環氧酶，預防血栓。"
+});
+
+// 題目311
+fullQuestionBank.push({
+    question: "311. 下列哪種體位最適合甲狀腺手術後病人？",
+    options: ["去枕平臥", "半坐臥位", "側臥位", "俯臥位"],
+    correct: 1,
+    explanation: "甲狀腺術後半坐臥位可減輕頸部充血水腫，利於呼吸和引流。"
+});
+
+// 題目312
+fullQuestionBank.push({
+    question: "312. 急性腦卒中病人，判斷有無吞嚥困難的簡易方法為？",
+    options: ["窪田飲水試驗", "Glasgow昏迷評分", "NIHSS評分", "Barthel指數"],
+    correct: 0,
+    explanation: "窪田飲水試驗讓病人喝30ml溫開水，觀察嗆咳情況，篩查吞嚥障礙。"
+});
+
+// 題目313
+fullQuestionBank.push({
+    question: "313. 下列哪種藥物不能用於治療支氣管哮喘？",
+    options: ["沙丁胺醇 (Salbutamol)", "異丙托溴銨 (Ipratropium bromide)", "普萘洛爾 (Propranolol)", "布地奈德 (Budesonide)"],
+    correct: 2,
+    explanation: "普萘洛爾 (Propranolol) 為非選擇性β阻斷劑，可誘發支氣管痙攣，哮喘患者禁用。"
+});
+
+// 題目314
+fullQuestionBank.push({
+    question: "314. 急性心肌梗死病人發生心源性休克，主要原因是？",
+    options: ["疼痛", "心律失常", "心肌壞死收縮力下降", "血容量不足"],
+    correct: 2,
+    explanation: "大面積心肌壞死導致心排血量急劇下降，引起心源性休克。"
+});
+
+// 題目315
+fullQuestionBank.push({
+    question: "315. 使用氟喹諾酮類抗生素（如左氧氟沙星）應注意？",
+    options: ["可能影響軟骨發育，兒童禁用", "需做皮試", "與酒精同服會中毒", "可引起高血鉀"],
+    correct: 0,
+    explanation: "氟喹諾酮類可影響軟骨發育，孕婦、哺乳期、兒童禁用。"
+});
+
+// 題目316
+fullQuestionBank.push({
+    question: "316. 下列哪項是肝硬化門脈高壓的典型表現？",
+    options: ["腹水、側支循環、脾腫大", "蜘蛛痣、肝掌", "黃疸、出血傾向", "噁心、嘔吐"],
+    correct: 0,
+    explanation: "門脈高壓三大表現：腹水、側支循環（食管胃底靜脈曲張）、脾腫大。"
+});
+
+// 題目317
+fullQuestionBank.push({
+    question: "317. 新生兒維生素K缺乏性出血，最常見的出血部位是？",
+    options: ["顱內", "消化道", "臍部", "皮下"],
+    correct: 1,
+    explanation: "新生兒維生素K缺乏常致消化道出血（嘔血、黑便），也可見臍部、顱內出血。"
+});
+
+// 題目318
+fullQuestionBank.push({
+    question: "318. 使用碳酸氫鈉糾正酸中毒時，應注意監測？",
+    options: ["血鉀", "血鈉", "血鈣", "以上皆是"],
+    correct: 3,
+    explanation: "碳酸氫鈉可引起高鈉血症、低鉀血症、遊離鈣減少（致手足抽搐），需監測電解質。"
+});
+
+// 題目319
+fullQuestionBank.push({
+    question: "319. 下列哪種情況禁用熱敷？",
+    options: ["關節扭傷48小時內", "肌肉勞損", "慢性關節炎", "痛經"],
+    correct: 0,
+    explanation: "急性損傷48小時內應冷敷，熱敷會加重出血和水腫。"
+});
+
+// 題目320
+fullQuestionBank.push({
+    question: "320. 使用青黴素類藥物前，必須執行的操作是？",
+    options: ["皮膚過敏試驗", "肝功能檢查", "腎功能檢查", "血常規"],
+    correct: 0,
+    explanation: "青黴素類易引起過敏反應，用前必須皮試，陰性方可使用。"
+});
+
+// 題目321
+fullQuestionBank.push({
+    question: "321. 下列哪項是診斷肺結核的金標準？",
+    options: ["胸部X光", "痰結核菌培養", "PPD皮試", "T-SPOT"],
+    correct: 1,
+    explanation: "痰結核菌培養陽性是確診肺結核的金標準，但耗時長。"
+});
+
+// 題目322
+fullQuestionBank.push({
+    question: "322. 使用呋塞米利尿時，最常見的電解質紊亂是？",
+    options: ["高血鉀", "低血鉀", "高血鈣", "低血鎂"],
+    correct: 1,
+    explanation: "呋塞米 (Furosemida) 為袢利尿劑，排鉀排鈉，易致低血鉀。"
+});
+
+// 題目323
+fullQuestionBank.push({
+    question: "323. 急性闌尾炎典型腹痛特點是？",
+    options: ["持續性右下腹痛", "轉移性右下腹痛", "陣發性臍周痛", "腰背部放射痛"],
+    correct: 1,
+    explanation: "急性闌尾炎典型表現為轉移性右下腹痛（先臍周/上腹，後固定於右下腹）。"
+});
+
+// 題目324
+fullQuestionBank.push({
+    question: "324. 使用抗甲狀腺藥物（如甲巰咪唑）期間，應監測？",
+    options: ["血常規（粒細胞）", "肝功能", "甲狀腺功能", "以上皆是"],
+    correct: 3,
+    explanation: "甲巰咪唑 (Tiamazol) 可致粒細胞缺乏、肝損害，需監測血常規、肝功能及甲狀腺功能。"
+});
+
+// 題目325
+fullQuestionBank.push({
+    question: "325. 下列哪項不是腦出血的常見原因？",
+    options: ["高血壓", "動脈瘤", "腦血管畸形", "低血糖"],
+    correct: 3,
+    explanation: "腦出血常見原因為高血壓、動脈瘤、血管畸形等，低血糖不引起出血。"
+});
+
+// 題目326
+fullQuestionBank.push({
+    question: "326. 使用胰島素泵的病人，胰島素貯存室應避免？",
+    options: ["高溫", "震動", "陽光直射", "以上皆是"],
+    correct: 3,
+    explanation: "胰島素應避免高溫、冷凍、震動及陽光直射，以免失效。"
+});
+
+// 題目327
+fullQuestionBank.push({
+    question: "327. 下列哪種消毒劑可用於皮膚消毒？",
+    options: ["2%戊二醛", "75%酒精", "含氯消毒劑", "過氧乙酸"],
+    correct: 1,
+    explanation: "75%酒精對皮膚刺激性小，常用於皮膚消毒；戊二醛、含氯消毒劑對皮膚刺激性大。"
+});
+
+// 題目328
+fullQuestionBank.push({
+    question: "328. 急性腎衰竭少尿期，最危險的電解質紊亂是？",
+    options: ["低鈉血症", "高鉀血症", "低鈣血症", "高鎂血症"],
+    correct: 1,
+    explanation: "高鉀血症可致心臟驟停，是急性腎衰竭少尿期最危險的併發症。"
+});
+
+// 題目329
+fullQuestionBank.push({
+    question: "329. 下列哪種藥物屬於長效β2受體激動劑？",
+    options: ["沙丁胺醇 (Salbutamol)", "特布他林 (Terbutaline)", "福莫特羅 (Formoterol)", "異丙腎上腺素"],
+    correct: 2,
+    explanation: "福莫特羅 (Formoterol) 為長效β2激動劑，作用持續12小時；沙丁胺醇為短效。"
+});
+
+// 題目330
+fullQuestionBank.push({
+    question: "330. 使用華法林期間，飲食應保持相對恆定，主要是因為？",
+    options: ["維生素K影響療效", "蛋白質影響吸收", "脂肪影響代謝", "碳水化合物影響"],
+    correct: 0,
+    explanation: "華法林 (Varfarina) 拮抗維生素K，食物中維生素K含量波動會影響INR。"
+});
+
+// 題目331
+fullQuestionBank.push({
+    question: "331. 下列哪項是判斷意識障礙程度的常用量表？",
+    options: ["Glasgow昏迷評分", "Braden評分", "Norton評分", "Morse評分"],
+    correct: 0,
+    explanation: "Glasgow昏迷評分 (GCS) 用於評估意識障礙程度，包括睜眼、語言、運動反應。"
+});
+
+// 題目332
+fullQuestionBank.push({
+    question: "332. 產後出血病人，使用宮縮劑無效時，應首先考慮？",
+    options: ["子宮動脈栓塞", "子宮切除", "填塞紗布", "按摩子宮"],
+    correct: 3,
+    explanation: "產後出血首先按摩子宮，同時使用宮縮劑，若無效再考慮其他措施。"
+});
+
+// 題目333
+fullQuestionBank.push({
+    question: "333. 下列哪種藥物屬於抗癲癇藥物，且對部分性發作首選？",
+    options: ["卡馬西平 (Carbamazepine)", "乙琥胺 (Ethosuximide)", "丙戊酸鈉 (Sodium valproate)", "氯硝西泮"],
+    correct: 0,
+    explanation: "卡馬西平 (Carbamazepina) 對部分性發作及全面強直-陣攣發作有效，為一線用藥。"
+});
+
+// 題目334
+fullQuestionBank.push({
+    question: "334. 使用硝苯地平控釋片時，病人應注意？",
+    options: ["整片吞服，不可嚼碎", "舌下含服", "溶解後服用", "咀嚼後吞服"],
+    correct: 0,
+    explanation: "控釋片必須整片吞服，嚼碎會導致劑量突釋，引起血壓驟降。"
+});
+
+// 題目335
+fullQuestionBank.push({
+    question: "335. 下列哪項是左心衰竭的典型表現？",
+    options: ["呼吸困難、肺底濕囉音", "頸靜脈怒張", "下肢水腫", "肝腫大"],
+    correct: 0,
+    explanation: "左心衰竭主要表現為肺循環淤血，如呼吸困難、咳嗽、咯血、肺底濕囉音。"
+});
+
+// 題目336
+fullQuestionBank.push({
+    question: "336. 使用阿托品有機磷中毒，達到「阿托品化」後應？",
+    options: ["停藥", "減量維持", "加大劑量", "改為口服"],
+    correct: 1,
+    explanation: "達到阿托品化（瞳孔散大、皮膚乾燥、心率加快）後，應減量維持，避免過量中毒。"
+});
+
+// 題目337
+fullQuestionBank.push({
+    question: "337. 下列哪項是類風濕關節炎的典型關節表現？",
+    options: ["對稱性小關節腫痛", "非對稱性大關節痛", "遊走性關節痛", "晨僵不明顯"],
+    correct: 0,
+    explanation: "類風濕關節炎多表現為對稱性小關節（腕、掌指、近端指間）腫痛，伴晨僵。"
+});
+
+// 題目338
+fullQuestionBank.push({
+    question: "338. 使用糖皮質激素長期治療時，為預防骨質疏鬆，應補充？",
+    options: ["鈣劑和維生素D", "鐵劑", "葉酸", "維生素B12"],
+    correct: 0,
+    explanation: "激素可致骨質疏鬆，需補充鈣劑和維生素D，必要時使用雙膦酸鹽。"
+});
+
+// 題目339
+fullQuestionBank.push({
+    question: "339. 下列哪種情況不宜使用哌替啶止痛？",
+    options: ["膽絞痛", "術後疼痛", "癌性疼痛", "顱腦損傷"],
+    correct: 3,
+    explanation: "哌替啶 (Meperidina) 可抑制呼吸、升高顱內壓，顱腦損傷病人禁用。"
+});
+
+// 題目340
+fullQuestionBank.push({
+    question: "340. 輸液過程中，病人出現咳嗽、咳粉紅色泡沫痰，可能為？",
+    options: ["輸液反應", "循環負荷過重", "空氣栓塞", "過敏反應"],
+    correct: 1,
+    explanation: "輸液過快可致急性肺水腫，表現為呼吸困難、咳粉紅色泡沫痰。"
+});
+
+// 題目341
+fullQuestionBank.push({
+    question: "341. 下列哪項是新生兒缺氧缺血性腦病的支持療法？",
+    options: ["亞低溫治療", "高壓氧", "鎮靜劑", "利尿劑"],
+    correct: 0,
+    explanation: "亞低溫治療（33-34℃）可降低腦代謝，減輕神經損傷，是新生兒HIE的支援療法。"
+});
+
+// 題目342
+fullQuestionBank.push({
+    question: "342. 使用丙戊酸鈉時，應監測？",
+    options: ["肝功能", "腎功能", "血常規", "凝血功能"],
+    correct: 0,
+    explanation: "丙戊酸鈉 (Valproato de sódio) 可致肝功能損害，用藥期間需監測肝功能。"
+});
+
+// 題目343
+fullQuestionBank.push({
+    question: "343. 下列哪項是COPD病人進行呼吸功能訓練的正確方法？",
+    options: ["縮唇呼吸和腹式呼吸", "深呼吸後屏氣", "快速淺呼吸", "用力吸氣"],
+    correct: 0,
+    explanation: "縮唇呼吸增加氣道內壓力，防止小氣道塌陷；腹式呼吸增加膈肌力量，改善通氣。"
+});
+
+// 題目344
+fullQuestionBank.push({
+    question: "344. 使用胺碘酮治療心律失常，最需注意的肺毒性表現為？",
+    options: ["咳嗽、呼吸困難", "胸痛", "咯血", "發熱"],
+    correct: 0,
+    explanation: "胺碘酮 (Amiodarona) 可致肺間質纖維化，表現為漸進性咳嗽、呼吸困難。"
+});
+
+// 題目345
+fullQuestionBank.push({
+    question: "345. 下列哪項是急性腎小球腎炎的典型尿液改變？",
+    options: ["血尿、蛋白尿", "白細胞尿", "乳糜尿", "膽紅素尿"],
+    correct: 0,
+    explanation: "急性腎小球腎炎常見血尿（肉眼或鏡下）、蛋白尿、紅細胞管型。"
+});
+
+// 題目346
+fullQuestionBank.push({
+    question: "346. 使用氯吡格雷進行抗血小板治療，如需緊急手術，應停藥多久？",
+    options: ["3天", "5天", "7天", "14天"],
+    correct: 1,
+    explanation: "氯吡格雷 (Clopidogrel) 不可逆抑制血小板，一般需停藥5天後血小板功能恢復。"
+});
+
+// 題目347
+fullQuestionBank.push({
+    question: "347. 下列哪項是深靜脈血栓的典型體徵？",
+    options: ["Homans徵陽性", "Murphy徵陽性", "Rovsing徵陽性", "Blumberg徵陽性"],
+    correct: 0,
+    explanation: "Homans徵（足背屈時小腿後部疼痛）提示小腿深靜脈血栓。"
+});
+
+// 題目348
+fullQuestionBank.push({
+    question: "348. 使用地西泮靜脈注射時，應注意？",
+    options: ["緩慢注射，避免呼吸抑制", "快速推注", "與其他藥混合", "不用稀釋"],
+    correct: 0,
+    explanation: "地西泮 (Diazepam) 靜注過快可抑制呼吸、引起低血壓，需緩慢注射（<2mg/min）。"
+});
+
+// 題目349
+fullQuestionBank.push({
+    question: "349. 下列哪項是甲狀腺功能減退症的典型表現？",
+    options: ["怕冷、體重增加、反應遲鈍", "怕熱、多汗、消瘦", "心悸、手抖", "失眠、煩躁"],
+    correct: 0,
+    explanation: "甲減因代謝降低，表現為怕冷、乏力、體重增加、記憶力減退、黏液性水腫。"
+});
+
+// 題目350
+fullQuestionBank.push({
+    question: "350. 使用鹽酸氨溴索化痰時，其主要作用是？",
+    options: ["稀釋痰液，促進排出", "直接止咳", "擴張支氣管", "抗炎"],
+    correct: 0,
+    explanation: "氨溴索 (Ambroxol) 能增加呼吸道漿液分泌，降低痰液黏稠度，促進咳出。"
+});
+
+// 題目351
+fullQuestionBank.push({
+    question: "351. 下列哪項是輸血前核對的「三查八對」中的「八對」之一？",
+    options: ["對血型", "對體溫", "對脈搏", "對呼吸"],
+    correct: 0,
+    explanation: "八對包括：姓名、性別、年齡、病歷號、床號、血型、配血結果、血袋號。"
+});
+
+// 題目352
+fullQuestionBank.push({
+    question: "352. 使用甘露醇降低顱內壓時，應注意？",
+    options: ["快速靜脈滴注", "緩慢滴注", "與其他藥混合", "肌肉注射"],
+    correct: 0,
+    explanation: "甘露醇 (Manitol) 需快速滴注（250ml在15-30分鐘內）才能形成高滲脫水效果。"
+});
+
+// 題目353
+fullQuestionBank.push({
+    question: "353. 下列哪項是臨終關懷的核心原則？",
+    options: ["延長生命", "減輕痛苦", "治癒疾病", "積極搶救"],
+    correct: 1,
+    explanation: "臨終關懷以提高生命品質、減輕痛苦、維護尊嚴為核心，不進行無意義的搶救。"
+});
+
+// 題目354
+fullQuestionBank.push({
+    question: "354. 使用異丙嗪（非那根）時，最常見的副作用是？",
+    options: ["嗜睡", "口乾", "心悸", "低血壓"],
+    correct: 0,
+    explanation: "異丙嗪 (Prometazina) 為抗組胺藥，有中樞鎮靜作用，易致嗜睡。"
+});
+
+// 題目355
+fullQuestionBank.push({
+    question: "355. 下列哪項是急性心肌梗死病人溶栓治療的禁忌症？",
+    options: ["近期有顱內出血", "高血壓控制良好", "年齡>75歲", "心絞痛發作"],
+    correct: 0,
+    explanation: "溶栓絕對禁忌包括：任何顱內出血病史、近期腦血管事件、活動性內臟出血等。"
+});
+
+// 題目356
+fullQuestionBank.push({
+    question: "356. 使用維生素K1治療華法林過量，給藥途徑通常是？",
+    options: ["靜脈注射", "皮下注射", "口服", "肌肉注射"],
+    correct: 1,
+    explanation: "輕度出血可皮下注射維生素K1，靜脈注射可能引起過敏反應，肌肉注射易致血腫。"
+});
+
+// 題目357
+fullQuestionBank.push({
+    question: "357. 下列哪項是糖尿病病人足部護理的正確措施？",
+    options: ["每天檢查足部", "用熱水袋保暖", "赤腳走路", "自行修剪雞眼"],
+    correct: 0,
+    explanation: "糖尿病足預防需每日檢查足部、保持清潔、穿合適鞋襪、避免燙傷和外傷。"
+});
+
+// 題目358
+fullQuestionBank.push({
+    question: "358. 使用卡馬西平治療三叉神經痛，應監測？",
+    options: ["血常規、肝功能", "腎功能", "血糖", "電解質"],
+    correct: 0,
+    explanation: "卡馬西平 (Carbamazepina) 可致骨髓抑制、肝功能損害，需監測血常規和肝功能。"
+});
+
+// 題目359
+fullQuestionBank.push({
+    question: "359. 下列哪項是急性腦膜炎的典型體徵？",
+    options: ["頸項強直", "Babinski徵陽性", "Kernig徵陽性", "以上皆是"],
+    correct: 3,
+    explanation: "腦膜刺激徵包括頸項強直、Kernig徵、Brudzinski徵，是急性腦膜炎的重要體徵。"
+});
+
+// 題目360
+fullQuestionBank.push({
+    question: "360. 使用環孢素的病人，應避免食用？",
+    options: ["柚子（葡萄柚）", "蘋果", "香蕉", "牛奶"],
+    correct: 0,
+    explanation: "葡萄柚抑制CYP3A4，可使環孢素 (Ciclosporina) 血藥濃度升高，增加腎毒性風險。"
+});
+
+// 題目361
+fullQuestionBank.push({
+    question: "361. 下列哪項是產後憂鬱症的典型表現？",
+    options: ["情緒低落、失眠、自責", "興奮多語", "幻覺妄想", "意識模糊"],
+    correct: 0,
+    explanation: "產後憂鬱症表現為持續性悲傷、失眠、食慾改變、無價值感，嚴重者有自傷或傷嬰念頭。"
+});
+
+// 題目362
+fullQuestionBank.push({
+    question: "362. 使用利多卡因治療室性心律失常，中毒劑量主要影響？",
+    options: ["中樞神經系統（嗜睡、抽搐）", "心臟傳導", "呼吸", "肝臟"],
+    correct: 0,
+    explanation: "利多卡因 (Lidocaína) 中毒先表現為中樞神經症狀（頭暈、嗜睡、抽搐），後影響心臟。"
+});
+
+// 題目363
+fullQuestionBank.push({
+    question: "363. 下列哪項是骨折復位後固定的主要目的？",
+    options: ["維持復位，促進癒合", "減輕疼痛", "預防感染", "方便護理"],
+    correct: 0,
+    explanation: "固定是為了維持骨折端對位，防止再移位，利於癒合。"
+});
+
+// 題目364
+fullQuestionBank.push({
+    question: "364. 使用甲狀腺素片（優甲樂）治療甲減，服藥時間最好是？",
+    options: ["清晨空腹", "飯後", "睡前", "隨時"],
+    correct: 0,
+    explanation: "左甲狀腺素 (Levotiroxina) 清晨空腹服用吸收最好，避免與食物、鈣劑等同服。"
+});
+
+// 題目365
+fullQuestionBank.push({
+    question: "365. 下列哪項是肝硬化腹水病人體位護理要點？",
+    options: ["半坐臥位", "平臥位", "側臥位", "俯臥位"],
+    correct: 0,
+    explanation: "半坐臥位可減輕呼吸困難，利於腹腔積液下移，減少對膈肌的壓迫。"
+});
+
+// 題目366
+fullQuestionBank.push({
+    question: "366. 使用青黴素G治療梅毒，可能出現的嚴重不良反應是？",
+    options: ["吉海反應 (Jarisch-Herxheimer)", "過敏性休克", "溶血性貧血", "以上皆是"],
+    correct: 3,
+    explanation: "青黴素治療梅毒可發生吉海反應（發熱、頭痛、肌痛），也可引起過敏反應、溶血等。"
+});
+
+// 題目367
+fullQuestionBank.push({
+    question: "367. 下列哪項是化療病人預防口腔黏膜炎的正確措施？",
+    options: ["軟毛牙刷", "含酒精漱口水", "進食粗糙食物", "熱敷"],
+    correct: 0,
+    explanation: "化療期間應使用軟毛牙刷，避免刺激性漱口水，保持口腔濕潤，預防黏膜破損。"
+});
+
+// 題目368
+fullQuestionBank.push({
+    question: "368. 使用硝酸甘油靜脈滴注時，應使用何種輸液器？",
+    options: ["非PVC材質（避免吸附）", "普通輸液器", "精密過濾器", "避光輸液器"],
+    correct: 0,
+    explanation: "硝酸甘油 (Nitroglicerina) 易被PVC材質吸附，應使用非PVC輸液器。"
+});
+
+// 題目369
+fullQuestionBank.push({
+    question: "369. 下列哪項是急性胰腺炎病人應禁用的藥物？",
+    options: ["嗎啡", "哌替啶", "阿托品", "奧曲肽"],
+    correct: 0,
+    explanation: "嗎啡 (Morfina) 可使Oddi括約肌痙攣，加重胰腺炎，應避免使用。"
+});
+
+// 題目370
+fullQuestionBank.push({
+    question: "370. 使用抗結核藥物時，為預防周圍神經炎應補充？",
+    options: ["維生素B6", "維生素C", "維生素B12", "葉酸"],
+    correct: 0,
+    explanation: "異煙肼 (Isoniazida) 可致周圍神經炎，需補充維生素B6預防。"
+});
+
+// 題目371
+fullQuestionBank.push({
+    question: "371. 下列哪項是腦震盪的典型表現？",
+    options: ["短暫意識障礙，逆行性遺忘", "持續昏迷", "顱內壓增高", "偏癱"],
+    correct: 0,
+    explanation: "腦震盪表現為一過性意識障礙（<30分鐘）、逆行性遺忘，神經系統檢查無陽性體徵。"
+});
+
+// 題目372
+fullQuestionBank.push({
+    question: "372. 使用肝素治療期間，監測凝血指標應選用？",
+    options: ["aPTT", "PT/INR", "TT", "FIB"],
+    correct: 0,
+    explanation: "肝素 (Heparina) 主要影響內源性凝血途徑，監測aPTT（部分凝血活酶時間）。"
+});
+
+// 題目373
+fullQuestionBank.push({
+    question: "373. 下列哪項是子癇前期病人使用硫酸鎂的注意事項？",
+    options: ["監測膝反射、呼吸、尿量", "快速靜脈推注", "與鈣劑同時使用", "肌肉注射最安全"],
+    correct: 0,
+    explanation: "硫酸鎂 (Sulfato de magnésio) 需監測中毒徵象：膝反射消失、呼吸<16次/分、尿量<25ml/h。"
+});
+
+// 題目374
+fullQuestionBank.push({
+    question: "374. 使用β受體阻斷劑（如美托洛爾）時，下列哪項錯誤？",
+    options: ["突然停藥可致反跳", "可掩蓋低血糖症狀", "哮喘患者可用", "心動過緩者禁用"],
+    correct: 2,
+    explanation: "非選擇性β阻斷劑可誘發支氣管痙攣，哮喘患者禁用；選擇性β1阻斷劑也需慎用。"
+});
+
+// 題目375
+fullQuestionBank.push({
+    question: "375. 下列哪項是胃潰瘍的典型疼痛特點？",
+    options: ["進餐後1小時內疼痛", "空腹痛、夜間痛", "持續性腹痛", "飢餓痛"],
+    correct: 0,
+    explanation: "胃潰瘍疼痛多在餐後0.5-1小時出現，持續1-2小時緩解；十二指腸潰瘍為空腹痛、夜間痛。"
+});
+
+// 題目376
+fullQuestionBank.push({
+    question: "376. 使用華法林初始治療時，為避免高凝狀態，常需與哪種藥物重疊？",
+    options: ["肝素", "阿司匹林", "氯吡格雷", "利伐沙班"],
+    correct: 0,
+    explanation: "華法林 (Varfarina) 起效慢，初始需與肝素重疊3-5天，待INR達標後停肝素。"
+});
+
+// 題目377
+fullQuestionBank.push({
+    question: "377. 下列哪項是預防術後肺不張的有效措施？",
+    options: ["鼓勵深呼吸和有效咳嗽", "應用鎮咳藥", "長期臥床", "束緊腹帶"],
+    correct: 0,
+    explanation: "術後應鼓勵病人深呼吸、咳嗽、早期活動，以預防肺不張。"
+});
+
+// 題目378
+fullQuestionBank.push({
+    question: "378. 使用氨基糖苷類抗生素時，為減少耳毒性，應？",
+    options: ["避免與呋塞米合用", "與青黴素混合靜滴", "快速靜注", "增加劑量"],
+    correct: 0,
+    explanation: "氨基糖苷類與呋塞米 (Furosemida) 均有耳毒性，合用風險增加。"
+});
+
+// 題目379
+fullQuestionBank.push({
+    question: "379. 下列哪項是登革熱的典型臨床表現？",
+    options: ["發熱、皮疹、肌肉關節痛", "咳嗽、咳痰", "腹瀉、嘔吐", "黃疸、出血"],
+    correct: 0,
+    explanation: "登革熱以高熱、頭痛、肌肉關節劇痛（斷骨熱）、皮疹為特徵。"
+});
+
+// 題目380
+fullQuestionBank.push({
+    question: "380. 使用胰島素治療時，最常見的急性併發症是？",
+    options: ["低血糖", "過敏反應", "脂肪萎縮", "水腫"],
+    correct: 0,
+    explanation: "胰島素用量不當、進食減少或運動過量均可致低血糖，是常見急性併發症。"
+});
+
+// 題目381
+fullQuestionBank.push({
+    question: "381. 下列哪項是急性膽囊炎的典型體徵？",
+    options: ["Murphy徵陽性", "麥氏點壓痛", "腰大肌試驗陽性", "閉孔內肌試驗陽性"],
+    correct: 0,
+    explanation: "Murphy徵（吸氣時觸診右肋下疼痛）是急性膽囊炎的典型體徵。"
+});
+
+// 題目382
+fullQuestionBank.push({
+    question: "382. 使用糖皮質激素吸入劑治療哮喘後，應立即？",
+    options: ["漱口", "飲水", "進食", "吸痰"],
+    correct: 0,
+    explanation: "吸入激素後漱口可清除殘留藥物，減少口腔念珠菌感染和聲音嘶啞。"
+});
+
+// 題目383
+fullQuestionBank.push({
+    question: "383. 下列哪項是缺鐵性貧血的典型血象？",
+    options: ["小細胞低色素性貧血", "大細胞性貧血", "正細胞性貧血", "再生障礙性貧血"],
+    correct: 0,
+    explanation: "缺鐵性貧血表現為小細胞低色素性貧血（MCV↓、MCHC↓）。"
+});
+
+// 題目384
+fullQuestionBank.push({
+    question: "384. 使用苯二氮䓬類藥物（如阿普唑侖）時，應注意？",
+    options: ["長期使用可致依賴", "可突然停藥", "與酒精同用無影響", "對肝腎無影響"],
+    correct: 0,
+    explanation: "苯二氮䓬類長期使用可產生耐受性和依賴性，停藥應逐漸減量。"
+});
+
+// 題目385
+fullQuestionBank.push({
+    question: "385. 下列哪項是急性一氧化碳中毒的急救要點？",
+    options: ["迅速脫離現場，高壓氧治療", "注射呼吸興奮劑", "口服亞甲藍", "大量輸液"],
+    correct: 0,
+    explanation: "一氧化碳中毒應立即移至通風處，給高濃度氧或高壓氧，糾正缺氧。"
+});
+
+// 題目386
+fullQuestionBank.push({
+    question: "386. 使用他汀類藥物治療期間，出現肌肉酸痛，應首先？",
+    options: ["查肌酸激酶 (CK)", "停藥觀察", "增加劑量", "加用止痛藥"],
+    correct: 0,
+    explanation: "他汀類可引起肌病，應檢測CK，若CK顯著升高需停藥。"
+});
+
+// 題目387
+fullQuestionBank.push({
+    question: "387. 下列哪項是腎病症候群的四大特徵？",
+    options: ["大量蛋白尿、低蛋白血症、水腫、高脂血症", "血尿、高血壓、水腫、少尿", "蛋白尿、血尿、水腫、高血壓", "膿尿、菌尿、發熱、腰痛"],
+    correct: 0,
+    explanation: "腎病症候群典型表現為「三高一低」：大量蛋白尿、低蛋白血症、水腫、高脂血症。"
+});
+
+// 題目388
+fullQuestionBank.push({
+    question: "388. 使用多巴酚丁胺時，其主要不良反應是？",
+    options: ["心率加快、血壓升高", "噁心嘔吐", "頭痛", "低血鉀"],
+    correct: 0,
+    explanation: "多巴酚丁胺 (Dobutamina) 為正性肌力藥，可致心率加快、血壓升高、心律失常。"
+});
+
+// 題目389
+fullQuestionBank.push({
+    question: "389. 下列哪項是預防壓瘡的正確措施？",
+    options: ["使用減壓床墊", "按摩已發紅部位", "使用圓形氣圈", "高溫熱敷"],
+    correct: 0,
+    explanation: "預防壓瘡應使用減壓裝置，避免按摩已受壓發紅部位（可能加重損傷）。"
+});
+
+// 題目390
+fullQuestionBank.push({
+    question: "390. 使用阿托品治療有機磷中毒，達到阿托品化的指標不包括？",
+    options: ["瞳孔縮小", "顏面潮紅", "口乾", "心率加快"],
+    correct: 0,
+    explanation: "阿托品化表現為瞳孔散大（而非縮小）、皮膚乾燥、顏面潮紅、心率加快、肺部囉音減少。"
+});
+
+// 題目391
+fullQuestionBank.push({
+    question: "391. 下列哪項是早期乳腺癌的典型表現？",
+    options: ["無痛性乳房腫塊", "乳頭血性溢液", "橘皮樣改變", "腋窩淋巴結腫大"],
+    correct: 0,
+    explanation: "早期乳腺癌常表現為無痛、單發、質硬、邊界不清的腫塊。"
+});
+
+// 題目392
+fullQuestionBank.push({
+    question: "392. 使用硫酸鎂治療子癇前期時，膝反射消失應立即？",
+    options: ["停藥並靜注葡萄糖酸鈣", "增加劑量", "肌肉注射", "觀察等待"],
+    correct: 0,
+    explanation: "膝反射消失提示鎂離子中毒，應立即停藥，並用10%葡萄糖酸鈣拮抗。"
+});
+
+// 題目393
+fullQuestionBank.push({
+    question: "393. 下列哪項是慢性心力衰竭的常用治療藥物？",
+    options: ["ACEI/ARB、β受體阻斷劑、利尿劑", "抗生素", "鎮咳藥", "鎮靜劑"],
+    correct: 0,
+    explanation: "心衰治療金三角：ACEI/ARB、β受體阻斷劑、醛固酮拮抗劑，必要時加用利尿劑。"
+});
+
+// 題目394
+fullQuestionBank.push({
+    question: "394. 使用地高辛時，應監測血藥濃度，治療窗為？",
+    options: ["0.5-2.0ng/mL", "2.0-3.0ng/mL", "3.0-4.0ng/mL", "4.0-5.0ng/mL"],
+    correct: 0,
+    explanation: "地高辛 (Digoxina) 治療濃度0.5-2.0ng/mL，>2.0ng/mL易中毒。"
+});
+
+// 題目395
+fullQuestionBank.push({
+    question: "395. 下列哪項是T管引流的正常現象？",
+    options: ["引流量逐漸減少，膽汁清亮", "引流量突然增加", "引流液渾濁", "引流管脫落"],
+    correct: 0,
+    explanation: "術後T管引流膽汁量逐漸減少，顏色由深黃變為清亮，若突然減少或增多需警惕。"
+});
+
+// 題目396
+fullQuestionBank.push({
+    question: "396. 使用青黴素類抗生素前，若病人陳述曾對青黴素過敏，應？",
+    options: ["禁用青黴素，改用其他藥物", "減量使用", "加強觀察", "做皮試後決定"],
+    correct: 0,
+    explanation: "有明確青黴素過敏史者禁用，不得再做皮試。"
+});
+
+// 題目397
+fullQuestionBank.push({
+    question: "397. 下列哪項是急性白血病化療後骨髓抑制期的危險？",
+    options: ["感染、出血", "貧血", "噁心嘔吐", "脫髮"],
+    correct: 0,
+    explanation: "骨髓抑制期粒細胞缺乏易感染，血小板減少易出血，是主要死因。"
+});
+
+// 題目398
+fullQuestionBank.push({
+    question: "398. 使用胺碘酮治療時，應避免與哪種藥物合用？",
+    options: ["奎尼丁", "青黴素", "對乙酰氨基酚", "維生素C"],
+    correct: 0,
+    explanation: "胺碘酮 (Amiodarona) 與延長QT間期的藥物（如奎尼丁）合用，增加尖端扭轉型室速風險。"
+});
+
+// 題目399
+fullQuestionBank.push({
+    question: "399. 下列哪項是腦膜炎球菌腦膜炎的皮膚特徵？",
+    options: ["瘀點、瘀斑", "玫瑰疹", "斑丘疹", "水皰"],
+    correct: 0,
+    explanation: "腦膜炎球菌敗血症可出現皮膚瘀點、瘀斑，是微血管栓塞所致。"
+});
+
+// 題目400
+fullQuestionBank.push({
+    question: "400. 使用去甲腎上腺素時，若藥液外滲，應立即？",
+    options: ["用酚妥拉明局部封閉", "熱敷", "冷敷", "抬高患肢"],
+    correct: 0,
+    explanation: "去甲腎上腺素 (Noradrenalina) 外滲可致組織壞死，應立即用酚妥拉明稀釋後局部注射。"
+});
+
+// 題目401
+fullQuestionBank.push({
+    question: "401. 下列哪項是進行腰穿時病人的正確體位？",
+    options: ["側臥位，屈頸屈膝", "平臥位", "半坐臥位", "俯臥位"],
+    correct: 0,
+    explanation: "腰穿時病人側臥，頭向胸部彎曲，雙手抱膝，使椎間隙增大。"
+});
+
+// 題目402
+fullQuestionBank.push({
+    question: "402. 使用華法林期間，若INR為1.5，應如何處理？",
+    options: ["增加劑量", "減少劑量", "維持原量", "停藥"],
+    correct: 0,
+    explanation: "INR低於目標範圍（2.0-3.0），需增加華法林劑量。"
+});
+
+// 題目403
+fullQuestionBank.push({
+    question: "403. 下列哪項是急性腎盂腎炎的典型臨床表現？",
+    options: ["發熱、寒戰、腰痛、膀胱刺激徵", "無痛性肉眼血尿", "水腫、高血壓", "少尿、無尿"],
+    correct: 0,
+    explanation: "急性腎盂腎炎有全身感染症狀（發熱、寒戰）和泌尿系症狀（腰痛、膀胱刺激徵）。"
+});
+
+// 題目404
+fullQuestionBank.push({
+    question: "404. 使用硝普鈉時，應避光輸注，原因是？",
+    options: ["見光易分解", "見光變質", "見光產生毒性", "以上皆是"],
+    correct: 0,
+    explanation: "硝普鈉 (Nitroprussiato de sódio) 遇光易分解產生氰化物，需用避光輸液器。"
+});
+
+// 題目405
+fullQuestionBank.push({
+    question: "405. 下列哪項是休克早期（代償期）的臨床表現？",
+    options: ["神志清楚，脈壓差減小", "血壓明顯下降", "無尿", "呼吸衰竭"],
+    correct: 0,
+    explanation: "休克早期血壓可正常或略高，但脈壓差減小，心率加快，皮膚蒼白濕冷。"
+});
+
+// 題目406
+fullQuestionBank.push({
+    question: "406. 使用嗎啡鎮痛時，出現呼吸抑制，可用哪種藥物拮抗？",
+    options: ["納洛酮", "氟馬西尼", "阿托品", "腎上腺素"],
+    correct: 0,
+    explanation: "納洛酮 (Naloxona) 為阿片受體拮抗劑，可逆轉嗎啡的呼吸抑制。"
+});
+
+// 題目407
+fullQuestionBank.push({
+    question: "407. 下列哪項是正常分娩的胎位？",
+    options: ["枕前位", "臀位", "橫位", "面先露"],
+    correct: 0,
+    explanation: "正常胎位為枕前位（頭位，枕骨向前）。"
+});
+
+// 題目408
+fullQuestionBank.push({
+    question: "408. 使用二甲雙胍時，最需警惕的不良反應是？",
+    options: ["乳酸酸中毒", "低血糖", "胃腸不適", "皮疹"],
+    correct: 0,
+    explanation: "二甲雙胍 (Metformina) 極罕見但嚴重的不良反應為乳酸酸中毒，尤其腎功能不全者。"
+});
+
+// 題目409
+fullQuestionBank.push({
+    question: "409. 下列哪項是急性扁桃體炎的常見病原體？",
+    options: ["A組溶血性鏈球菌", "金黃色葡萄球菌", "肺炎鏈球菌", "流感嗜血桿菌"],
+    correct: 0,
+    explanation: "急性化膿性扁桃體炎多由A組溶血性鏈球菌引起。"
+});
+
+// 題目410
+fullQuestionBank.push({
+    question: "410. 使用潑尼松長期治療時，為預防骨質疏鬆，應建議病人？",
+    options: ["補充鈣劑和維生素D", "臥床休息", "高鹽飲食", "減少戶外活動"],
+    correct: 0,
+    explanation: "激素致骨質流失，需補充鈣劑、維生素D，並適當負重運動。"
+});
+
+// 題目411
+fullQuestionBank.push({
+    question: "411. 下列哪項是低血糖的典型表現？",
+    options: ["出汗、心悸、手抖", "多飲、多尿", "頭痛、嘔吐", "腹痛、腹瀉"],
+    correct: 0,
+    explanation: "低血糖表現為交感神經興奮（出汗、心悸、手抖）和中樞神經症狀（頭暈、意識模糊）。"
+});
+
+// 題目412
+fullQuestionBank.push({
+    question: "412. 使用環磷酰胺時，為預防出血性膀胱炎，應？",
+    options: ["多飲水，必要時使用美司鈉", "減少劑量", "與抗生素合用", "監測血常規"],
+    correct: 0,
+    explanation: "環磷酰胺 (Ciclofosfamida) 的代謝物丙烯醛刺激膀胱，需多飲水、排尿，並用美司鈉解救。"
+});
+
+// 題目413
+fullQuestionBank.push({
+    question: "413. 下列哪項是深二度燒傷的臨床特點？",
+    options: ["水皰較小，基底紅白相間，痛覺遲鈍", "水皰大，基底潮紅，劇痛", "蠟白，無痛，質韌", "焦痂，無痛"],
+    correct: 0,
+    explanation: "深二度燒傷達真皮深層，痛覺遲鈍，水皰小，基底紅白相間。"
+});
+
+// 題目414
+fullQuestionBank.push({
+    question: "414. 使用氯氮平治療精神分裂症時，需常規監測？",
+    options: ["血常規（粒細胞）", "肝功能", "心電圖", "血糖"],
+    correct: 0,
+    explanation: "氯氮平 (Clozapina) 最嚴重不良反應為粒細胞缺乏，需定期監測血常規。"
+});
+
+// 題目415
+fullQuestionBank.push({
+    question: "415. 下列哪項是急性心肌梗死病人心電圖的典型改變？",
+    options: ["ST段弓背向上抬高", "ST段壓低", "T波倒置", "病理性Q波"],
+    correct: 0,
+    explanation: "急性期ST段弓背向上抬高，隨之T波倒置、出現病理性Q波。"
+});
+
+// 題目416
+fullQuestionBank.push({
+    question: "416. 使用阿司匹林時，最常見的不良反應是？",
+    options: ["胃腸道刺激", "肝損害", "腎損害", "過敏"],
+    correct: 0,
+    explanation: "阿司匹林 (Ácido acetilsalicílico) 可損傷胃黏膜，引起噁心、潰瘍、出血。"
+});
+
+// 題目417
+fullQuestionBank.push({
+    question: "417. 下列哪項是癲癇大發作的典型表現？",
+    options: ["意識喪失、全身強直-陣攣發作", "失神發作", "肌陣攣", "複雜部分性發作"],
+    correct: 0,
+    explanation: "全面強直-陣攣發作表現為意識喪失、全身肌肉強直後陣攣抽搐。"
+});
+
+// 題目418
+fullQuestionBank.push({
+    question: "418. 使用碳酸氫鈉鹼化尿液時，主要用於？",
+    options: ["促進弱酸性藥物排泄", "促進弱鹼性藥物排泄", "治療代謝性鹼中毒", "補鈉"],
+    correct: 0,
+    explanation: "鹼化尿液可促進弱酸性藥物（如巴比妥類、水楊酸類）排泄。"
+});
+
+// 題目419
+fullQuestionBank.push({
+    question: "419. 下列哪項是急性病毒性肝炎的典型表現？",
+    options: ["乏力、食慾減退、黃疸", "劇烈腹痛", "高熱", "腹瀉"],
+    correct: 0,
+    explanation: "急性肝炎有全身乏力、消化道症狀、肝功能異常，可有黃疸。"
+});
+
+// 題目420
+fullQuestionBank.push({
+    question: "420. 使用肝素期間，若出現血小板計數下降，應考慮？",
+    options: ["肝素誘導的血小板減少症 (HIT)", "原發病所致", "檢驗誤差", "繼續用藥"],
+    correct: 0,
+    explanation: "HIT是肝素嚴重不良反應，血小板下降50%以上，可致血栓形成。"
+});
+
+// 題目421
+fullQuestionBank.push({
+    question: "421. 下列哪項是骨折早期最常見的併發症？",
+    options: ["休克", "脂肪栓塞", "感染", "骨筋膜室症候群"],
+    correct: 0,
+    explanation: "多發傷或開放性骨折可因失血過多致休克，是早期最常見併發症。"
+});
+
+// 題目422
+fullQuestionBank.push({
+    question: "422. 使用苯巴比妥時，長期使用應注意？",
+    options: ["耐藥性和依賴性", "肝損害", "腎損害", "心臟毒性"],
+    correct: 0,
+    explanation: "苯巴比妥 (Fenobarbital) 為鎮靜催眠藥，長期使用可致耐受、依賴和戒斷症狀。"
+});
+
+// 題目423
+fullQuestionBank.push({
+    question: "423. 下列哪項是正常尿量的標準？",
+    options: ["1000-2000ml/24h", "<400ml/24h", ">2500ml/24h", "100-500ml/24h"],
+    correct: 0,
+    explanation: "正常成人24小時尿量約1000-2000ml，少尿<400ml/24h，多尿>2500ml/24h。"
+});
+
+// 題目424
+fullQuestionBank.push({
+    question: "424. 使用左甲狀腺素時，劑量過高可出現？",
+    options: ["心悸、多汗、消瘦", "嗜睡、怕冷", "便秘", "水腫"],
+    correct: 0,
+    explanation: "甲狀腺素過量致甲亢症狀，如心悸、多汗、食慾亢進、體重下降。"
+});
+
+// 題目425
+fullQuestionBank.push({
+    question: "425. 下列哪項是預防呼吸機相關性肺炎的措施？",
+    options: ["抬高床頭30-45度", "平臥位", "每天更換呼吸機管路", "使用鎮靜劑"],
+    correct: 0,
+    explanation: "抬高床頭可減少胃內容物反流誤吸，是預防VAP的有效措施。"
+});
+
+// 題目426
+fullQuestionBank.push({
+    question: "426. 使用青黴素類抗生素時，若出現過敏性休克，首選藥物是？",
+    options: ["腎上腺素", "地塞米松", "異丙嗪", "多巴胺"],
+    correct: 0,
+    explanation: "過敏性休克首選腎上腺素 (Adrenalina) 肌肉注射。"
+});
+
+// 題目427
+fullQuestionBank.push({
+    question: "427. 下列哪項是缺鐵性貧血的常見原因？",
+    options: ["慢性失血", "葉酸缺乏", "維生素B12缺乏", "骨髓造血障礙"],
+    correct: 0,
+    explanation: "慢性失血（如月經過多、消化道出血）是缺鐵性貧血最常見原因。"
+});
+
+// 題目428
+fullQuestionBank.push({
+    question: "428. 使用胺碘酮治療時，應定期監測？",
+    options: ["甲狀腺功能、肝功能、肺功能", "腎功能", "血糖", "電解質"],
+    correct: 0,
+    explanation: "胺碘酮 (Amiodarona) 可致甲狀腺功能異常、肝損害、肺纖維化，需定期監測。"
+});
+
+// 題目429
+fullQuestionBank.push({
+    question: "429. 下列哪項是腦出血與腦梗死的鑑別要點？",
+    options: ["腦出血多活動中發病，腦梗死多靜止中發病", "腦出血CT為低密度灶", "腦梗死腦脊液為血性", "以上皆非"],
+    correct: 0,
+    explanation: "腦出血多在活動中發病，CT顯示高密度灶；腦梗死多在安靜中發病，CT顯示低密度灶。"
+});
+
+// 題目430
+fullQuestionBank.push({
+    question: "430. 使用異煙肼治療結核病時，應常規加用維生素B6的目的是？",
+    options: ["預防周圍神經炎", "增強療效", "減少肝毒性", "促進吸收"],
+    correct: 0,
+    explanation: "異煙肼 (Isoniazida) 與維生素B6結構相似，競爭性抑制B6利用，需補充預防神經炎。"
+});
+
+// 題目431
+fullQuestionBank.push({
+    question: "431. 下列哪項是正常產後惡露的變化順序？",
+    options: ["血性惡露→漿液性惡露→白色惡露", "漿液性→血性→白色", "白色→血性→漿液", "血性→白色→漿液"],
+    correct: 0,
+    explanation: "產後惡露先為血性（持續3-4天），後轉為漿液性（約10天），最後為白色惡露（約3週）。"
+});
+
+// 題目432
+fullQuestionBank.push({
+    question: "432. 使用氟康唑治療念珠菌感染時，應注意監測？",
+    options: ["肝功能", "腎功能", "血常規", "電解質"],
+    correct: 0,
+    explanation: "氟康唑 (Fluconazol) 可致肝損害，用藥期間需監測肝功能。"
+});
+
+// 題目433
+fullQuestionBank.push({
+    question: "433. 下列哪項是急性腹膜炎的典型體徵？",
+    options: ["腹部壓痛、反跳痛、肌緊張", "移動性濁音", "腸鳴音亢進", "腹部包塊"],
+    correct: 0,
+    explanation: "腹膜刺激徵包括壓痛、反跳痛、肌緊張，是急性腹膜炎的典型體徵。"
+});
+
+// 題目434
+fullQuestionBank.push({
+    question: "434. 使用地塞米松時，長期用藥者應注意？",
+    options: ["低血鉀、高血糖、骨質疏鬆", "高血鉀", "低血糖", "貧血"],
+    correct: 0,
+    explanation: "糖皮質激素 (Dexametasona) 可致水鈉潴留、排鉀、血糖升高、骨質疏鬆等。"
+});
+
+// 題目435
+fullQuestionBank.push({
+    question: "435. 下列哪項是缺鉀的典型心電圖改變？",
+    options: ["U波增高", "T波高尖", "QT間期縮短", "ST段抬高"],
+    correct: 0,
+    explanation: "低血鉀心電圖表現為U波增高、T波低平、ST段壓低。"
+});
+
+// 題目436
+fullQuestionBank.push({
+    question: "436. 使用奧美拉唑治療胃潰瘍時，最佳服藥時間是？",
+    options: ["清晨空腹", "飯後", "睡前", "餐中"],
+    correct: 0,
+    explanation: "奧美拉唑 (Omeprazol) 為質子泵抑制劑，清晨空腹服用效果最好。"
+});
+
+// 題目437
+fullQuestionBank.push({
+    question: "437. 下列哪項是流行性感冒的病原體？",
+    options: ["流感病毒", "鼻病毒", "腺病毒", "呼吸道合胞病毒"],
+    correct: 0,
+    explanation: "流感由流感病毒（甲、乙、丙型）引起。"
+});
+
+// 題目438
+fullQuestionBank.push({
+    question: "438. 使用肝素期間，監測aPTT的目標值為正常對照值的？",
+    options: ["1.5-2.5倍", "1.0-1.5倍", "2.5-3.5倍", "3.5-4.5倍"],
+    correct: 0,
+    explanation: "肝素治療時aPTT應維持在正常對照值的1.5-2.5倍。"
+});
+
+// 題目439
+fullQuestionBank.push({
+    question: "439. 下列哪項是兒童生長髮育的第一個高峰期？",
+    options: ["嬰兒期", "幼兒期", "學齡前期", "青春期"],
+    correct: 0,
+    explanation: "嬰兒期（出生後第一年）是生長髮育的第一個高峰期。"
+});
+
+// 題目440
+fullQuestionBank.push({
+    question: "440. 使用阿托品時，出現口乾、視物模糊，應如何處理？",
+    options: ["減量或停藥觀察", "加用毛果芸香鹼", "大量飲水", "繼續用藥"],
+    correct: 0,
+    explanation: "阿托品 (Atropina) 的副作用與劑量相關，輕度反應可減量，嚴重時需停藥。"
+});
+
+// 題目441
+fullQuestionBank.push({
+    question: "441. 下列哪項是慢性支氣管炎的診斷標準？",
+    options: ["每年咳嗽咳痰超過3個月，連續2年以上", "咳嗽咳痰1個月", "發作性喘息", "胸悶氣短"],
+    correct: 0,
+    explanation: "慢性支氣管炎臨床定義為每年咳嗽咳痰≥3個月，連續≥2年，並排除其他原因。"
+});
+
+// 題目442
+fullQuestionBank.push({
+    question: "442. 使用多巴胺時，若劑量＞10μg/kg/min，其主要作用為？",
+    options: ["興奮α受體，血管收縮", "興奮β1受體，強心", "興奮多巴胺受體", "無作用"],
+    correct: 0,
+    explanation: "大劑量多巴胺 (Dopamina) 主要興奮α受體，引起血管收縮、血壓升高。"
+});
+
+// 題目443
+fullQuestionBank.push({
+    question: "443. 下列哪項是急性胃腸炎的典型表現？",
+    options: ["嘔吐、腹瀉、腹痛", "發熱、黃疸", "血便", "便秘"],
+    correct: 0,
+    explanation: "急性胃腸炎以噁心、嘔吐、腹瀉、腹痛為主要表現，多由病毒或細菌感染引起。"
+});
+
+// 題目444
+fullQuestionBank.push({
+    question: "444. 使用華法林期間，若INR＞4.5且無出血，應？",
+    options: ["停藥並口服小劑量維生素K1", "立即輸血", "繼續用藥", "加大劑量"],
+    correct: 0,
+    explanation: "INR過高但無出血，可暫停華法林，口服維生素K1（1-2.5mg）糾正。"
+});
+
+// 題目445
+fullQuestionBank.push({
+    question: "445. 下列哪項是典型心絞痛疼痛的緩解方式？",
+    options: ["休息或含服硝酸甘油後數分鐘緩解", "含服硝酸甘油後30分鐘緩解", "活動後緩解", "按壓後緩解"],
+    correct: 0,
+    explanation: "心絞痛休息或含服硝酸甘油 (Nitroglicerina) 後多在3-5分鐘內緩解。"
+});
+
+// 題目446
+fullQuestionBank.push({
+    question: "446. 使用青黴素類抗生素時，若需靜脈滴注，溶媒首選？",
+    options: ["生理鹽水", "5%葡萄糖", "10%葡萄糖", "林格氏液"],
+    correct: 0,
+    explanation: "青黴素在酸性環境中易分解，應選用中性生理鹽水作為溶媒。"
+});
+
+// 題目447
+fullQuestionBank.push({
+    question: "447. 下列哪項是肝硬化失代償期最常見的死亡原因？",
+    options: ["肝性腦病", "消化道出血", "感染", "肝腎綜合徵"],
+    correct: 1,
+    explanation: "食管胃底靜脈曲張破裂出血是肝硬化失代償期最常見的死亡原因之一。"
+});
+
+// 題目448
+fullQuestionBank.push({
+    question: "448. 使用硝苯地平控釋片時，若出現踝部水腫，是因為？",
+    options: ["毛細血管前擴張", "心功能不全", "腎功能不全", "低蛋白血症"],
+    correct: 0,
+    explanation: "硝苯地平 (Nifedipina) 擴張小動脈，毛細血管靜水壓升高，致水腫，非心衰所致。"
+});
+
+// 題目449
+fullQuestionBank.push({
+    question: "449. 下列哪項是COPD病人長期家庭氧療的每日吸氧時間？",
+    options: ["＞15小時", "＞10小時", "＞8小時", "＞5小時"],
+    correct: 0,
+    explanation: "COPD長期家庭氧療應每天吸氧≥15小時，包括夜間。"
+});
+
+// 題目450
+fullQuestionBank.push({
+    question: "450. 使用胺碘酮時，最常見的皮膚不良反應是？",
+    options: ["藍灰色色素沉著", "皮疹", "脫髮", "光過敏"],
+    correct: 0,
+    explanation: "長期用胺碘酮 (Amiodarona) 可致皮膚藍灰色沉著，尤其在陽光暴露部位。"
+});
+
+// 題目451
+fullQuestionBank.push({
+    question: "451. 下列哪項是蛛網膜下腔出血的典型表現？",
+    options: ["突然劇烈頭痛、噁心嘔吐、腦膜刺激徵", "偏癱", "失語", "意識障礙"],
+    correct: 0,
+    explanation: "蛛網膜下腔出血多為突然發生的劈裂樣頭痛，伴腦膜刺激徵。"
+});
+
+// 題目452
+fullQuestionBank.push({
+    question: "452. 使用地西泮治療癲癇持續狀態時，給藥途徑為？",
+    options: ["靜脈注射", "肌肉注射", "口服", "直腸給藥"],
+    correct: 0,
+    explanation: "癲癇持續狀態需迅速止驚，首選地西泮 (Diazepam) 靜脈注射。"
+});
+
+// 題目453
+fullQuestionBank.push({
+    question: "453. 下列哪項是急性腎盂腎炎最常見的致病菌？",
+    options: ["大腸桿菌", "金黃色葡萄球菌", "變形桿菌", "克雷伯菌"],
+    correct: 0,
+    explanation: "急性腎盂腎炎最常見病原體為大腸桿菌 (E. coli)。"
+});
+
+// 題目454
+fullQuestionBank.push({
+    question: "454. 使用胰島素時，為避免注射部位脂肪增生，應？",
+    options: ["輪換注射部位", "每次消毒", "使用長針頭", "注射後按摩"],
+    correct: 0,
+    explanation: "胰島素注射應輪換部位，避免同一點短期內重複注射，以防脂肪增生或萎縮。"
+});
+
+// 題目455
+fullQuestionBank.push({
+    question: "455. 下列哪項是肺栓塞的典型心電圖改變？",
+    options: ["SⅠQⅢTⅢ", "ST段抬高", "T波倒置", "病理性Q波"],
+    correct: 0,
+    explanation: "肺栓塞心電圖可表現為SⅠQⅢTⅢ（Ⅰ導聯S波深，Ⅲ導聯Q波和T波倒置）。"
+});
+
+// 題目456
+fullQuestionBank.push({
+    question: "456. 使用碳酸氫鈉糾正代謝性酸中毒時，過量可導致？",
+    options: ["代謝性鹼中毒", "呼吸性鹼中毒", "高血鉀", "低血鈉"],
+    correct: 0,
+    explanation: "碳酸氫鈉過量可致醫源性代謝性鹼中毒，引起低鉀、心律失常。"
+});
+
+// 題目457
+fullQuestionBank.push({
+    question: "457. 下列哪項是手術後早期活動的禁忌症？",
+    options: ["休克", "術後傷口疼痛", "留置引流管", "高齡"],
+    correct: 0,
+    explanation: "休克病人需絕對臥床，不能早期活動。"
+});
+
+// 題目458
+fullQuestionBank.push({
+    question: "458. 使用異丙嗪時，不宜與哪種藥物合用？",
+    options: ["中樞抑制劑（如酒精、鎮靜藥）", "抗生素", "降壓藥", "利尿劑"],
+    correct: 0,
+    explanation: "異丙嗪 (Prometazina) 有中樞抑制作用，與其他中樞抑制劑合用會加強抑制。"
+});
+
+// 題目459
+fullQuestionBank.push({
+    question: "459. 下列哪項是類風濕關節炎的關節外表現？",
+    options: ["類風濕結節", "鞏膜炎", "貧血", "以上皆是"],
+    correct: 3,
+    explanation: "類風濕關節炎可出現類風濕結節、血管炎、心包炎、鞏膜炎、貧血等關節外表現。"
+});
+
+// 題目460
+fullQuestionBank.push({
+    question: "460. 使用華法林時，若需緊急逆轉抗凝作用，應選用？",
+    options: ["新鮮冰凍血漿或凝血酶原複合物", "維生素K1口服", "止血敏", "氨甲環酸"],
+    correct: 0,
+    explanation: "緊急情況下（如顱內出血），需快速逆轉，應輸注新鮮冰凍血漿或凝血酶原複合物。"
+});
+
+// 題目461
+fullQuestionBank.push({
+    question: "461. 下列哪項是低血鈣的典型表現？",
+    options: ["手足抽搐", "肌肉無力", "噁心嘔吐", "心律失常"],
+    correct: 0,
+    explanation: "低血鈣可致神經肌肉興奮性增高，表現為手足抽搐、Chvostek徵陽性。"
+});
+
+// 題目462
+fullQuestionBank.push({
+    question: "462. 使用氯吡格雷時，若需急診手術，應停藥？",
+    options: ["5天", "1天", "3天", "7天"],
+    correct: 0,
+    explanation: "氯吡格雷 (Clopidogrel) 不可逆抑制血小板，需停藥5天待血小板功能恢復。"
+});
+
+// 題目463
+fullQuestionBank.push({
+    question: "463. 下列哪項是急性支氣管炎的典型表現？",
+    options: ["咳嗽、咳痰，無呼吸困難", "呼吸困難、喘鳴", "咯血", "胸痛"],
+    correct: 0,
+    explanation: "急性支氣管炎主要表現為咳嗽，初為乾咳，後有痰，一般無呼吸困難。"
+});
+
+// 題目464
+fullQuestionBank.push({
+    question: "464. 使用呋塞米時，為避免電解質紊亂，常與哪種藥物合用？",
+    options: ["螺內酯", "氫氯噻嗪", "氯化鉀口服", "葡萄糖酸鈣"],
+    correct: 0,
+    explanation: "呋塞米 (Furosemida) 與螺內酯 (Espironolactona) 合用可對抗排鉀作用。"
+});
+
+// 題目465
+fullQuestionBank.push({
+    question: "465. 下列哪項是腦膜炎球菌腦膜炎的治療首選？",
+    options: ["青黴素G", "頭孢曲松", "氯黴素", "萬古黴素"],
+    correct: 0,
+    explanation: "青黴素G對腦膜炎球菌高度敏感，為首選藥物；耐藥時可選頭孢曲松。"
+});
+
+// 題目466
+fullQuestionBank.push({
+    question: "466. 使用胰島素時，若出現Somogyi現象，應如何處理？",
+    options: ["減少晚餐前胰島素劑量", "增加晚餐前胰島素", "睡前加餐", "監測血糖"],
+    correct: 0,
+    explanation: "Somogyi現象指夜間低血糖後反跳性高血糖，應減少胰島素劑量或睡前加餐。"
+});
+
+// 題目467
+fullQuestionBank.push({
+    question: "467. 下列哪項是急性胰腺炎病人血清澱粉酶的變化規律？",
+    options: ["6-12小時開始升高，48小時下降", "立即升高，持續一週", "24小時後升高", "不升高"],
+    correct: 0,
+    explanation: "急性胰腺炎血澱粉酶於發病6-12小時開始升高，48小時開始下降，持續3-5天。"
+});
+
+// 題目468
+fullQuestionBank.push({
+    question: "468. 使用胺碘酮時，應避免與哪種藥物合用以防QT延長？",
+    options: ["莫西沙星", "青黴素", "頭孢菌素", "阿莫西林"],
+    correct: 0,
+    explanation: "氟喹諾酮類（如莫西沙星）可延長QT間期，與胺碘酮 (Amiodarona) 合用增加尖端扭轉型室速風險。"
+});
+
+// 題目469
+fullQuestionBank.push({
+    question: "469. 下列哪項是蛛網膜下腔出血最常見的病因？",
+    options: ["先天性動脈瘤", "高血壓", "動靜脈畸形", "煙霧病"],
+    correct: 0,
+    explanation: "顱內動脈瘤破裂是蛛網膜下腔出血最常見原因（約50-80%）。"
+});
+
+// 題目470
+fullQuestionBank.push({
+    question: "470. 使用糖皮質激素時，為減少胃腸道副作用，應？",
+    options: ["餐後服藥", "空腹服藥", "與抗酸藥同服", "多飲水"],
+    correct: 0,
+    explanation: "激素可致胃黏膜損傷，餐後服藥可減輕刺激。"
+});
+
+// 題目471
+fullQuestionBank.push({
+    question: "471. 下列哪項是急性腎盂腎炎的抗生素療程？",
+    options: ["10-14天", "3-5天", "7-10天", "14-21天"],
+    correct: 0,
+    explanation: "急性腎盂腎炎抗生素療程一般為10-14天，重症可延長。"
+});
+
+// 題目472
+fullQuestionBank.push({
+    question: "472. 使用阿托品時，出現譫妄、躁動，應如何處理？",
+    options: ["停藥並用毒扁豆鹼", "加用鎮靜劑", "繼續用藥", "多飲水"],
+    correct: 0,
+    explanation: "阿托品 (Atropina) 中毒出現中樞興奮症狀時，可用毒扁豆鹼對抗。"
+});
+
+// 題目473
+fullQuestionBank.push({
+    question: "473. 下列哪項是缺鐵性貧血的典型血常規表現？",
+    options: ["MCV＜80fl，MCHC＜32%", "MCV＞100fl", "MCHC＞36%", "網織紅細胞增多"],
+    correct: 0,
+    explanation: "缺鐵性貧血為小細胞低色素性，MCV、MCHC均降低。"
+});
+
+// 題目474
+fullQuestionBank.push({
+    question: "474. 使用硝普鈉時，若連續應用超過48小時，應監測？",
+    options: ["血中氰化物或硫氰酸鹽濃度", "血鉀", "血糖", "肝功能"],
+    correct: 0,
+    explanation: "硝普鈉 (Nitroprussiato) 代謝產生氰化物和硫氰酸鹽，長時間使用需監測血藥濃度。"
+});
+
+// 題目475
+fullQuestionBank.push({
+    question: "475. 下列哪項是水痘的典型皮疹特點？",
+    options: ["向心性分佈，斑疹、丘疹、皰疹、結痂同時存在", "離心性分佈", "沿神經分佈", "全身對稱"],
+    correct: 0,
+    explanation: "水痘皮疹呈向心性分佈（軀幹多四肢少），且不同形態皮疹（斑、丘、皰、痂）同時存在。"
+});
+
+// 題目476
+fullQuestionBank.push({
+    question: "476. 使用多巴酚丁胺時，若劑量過大，主要不良反應是？",
+    options: ["心率加快、血壓升高", "低血壓", "心動過緩", "頭痛"],
+    correct: 0,
+    explanation: "多巴酚丁胺 (Dobutamina) 過量可致明顯心率加快、血壓升高、心律失常。"
+});
+
+// 題目477
+fullQuestionBank.push({
+    question: "477. 下列哪項是正常分娩第一產程的定義？",
+    options: ["從規律宮縮到宮口開全", "從宮口開全到胎兒娩出", "從胎兒娩出到胎盤娩出", "從胎盤娩出到產後2小時"],
+    correct: 0,
+    explanation: "第一產程為宮頸擴張期，從規律宮縮開始到宮口開全。"
+});
+
+// 題目478
+fullQuestionBank.push({
+    question: "478. 使用甲氨蝶呤治療類風濕關節炎時，應常規補充？",
+    options: ["葉酸", "維生素B12", "鐵劑", "鈣劑"],
+    correct: 0,
+    explanation: "甲氨蝶呤 (Metotrexato) 是葉酸拮抗劑，補充葉酸可減少口腔炎、肝損害等副作用。"
+});
+
+// 題目479
+fullQuestionBank.push({
+    question: "479. 下列哪項是腦幹損傷的典型表現？",
+    options: ["意識障礙、瞳孔多變、交叉癱", "偏癱", "失語", "偏盲"],
+    correct: 0,
+    explanation: "腦幹損傷可致意識障礙、瞳孔大小多變、眼球位置異常、交叉性癱瘓。"
+});
+
+// 題目480
+fullQuestionBank.push({
+    question: "480. 使用肝素時，若出現嚴重出血，應使用何種藥物拮抗？",
+    options: ["魚精蛋白", "維生素K1", "氨甲環酸", "酚磺乙胺"],
+    correct: 0,
+    explanation: "魚精蛋白 (Protamina) 可與肝素結合，迅速中和其抗凝作用。"
+});
+
+// 題目481
+fullQuestionBank.push({
+    question: "481. 下列哪項是肺炎鏈球菌肺炎的典型痰液性狀？",
+    options: ["鐵鏽色痰", "膿臭痰", "白色泡沫痰", "粉紅色泡沫痰"],
+    correct: 0,
+    explanation: "肺炎鏈球菌肺炎典型者咳鐵鏽色痰（紅細胞滲出所致）。"
+});
+
+// 題目482
+fullQuestionBank.push({
+    question: "482. 使用胺碘酮時，若出現肺毒性，最早表現為？",
+    options: ["乾咳、活動後氣短", "咯血", "胸痛", "發熱"],
+    correct: 0,
+    explanation: "胺碘酮 (Amiodarona) 肺毒性早期表現為漸進性乾咳、呼吸困難。"
+});
+
+// 題目483
+fullQuestionBank.push({
+    question: "483. 下列哪項是缺鉀的常見原因？",
+    options: ["長期使用呋塞米", "長期使用螺內酯", "高鉀飲食", "酸中毒"],
+    correct: 0,
+    explanation: "袢利尿劑（呋塞米）排鉀，是低血鉀常見原因；螺內酯保鉀。"
+});
+
+// 題目484
+fullQuestionBank.push({
+    question: "484. 使用地高辛時，出現黃視、綠視，提示？",
+    options: ["地高辛中毒", "劑量不足", "正常現象", "視網膜病變"],
+    correct: 0,
+    explanation: "視覺異常（黃視、綠視）是地高辛 (Digoxina) 中毒的典型表現。"
+});
+
+// 題目485
+fullQuestionBank.push({
+    question: "485. 下列哪項是急性闌尾炎手術後最常見的併發症？",
+    options: ["切口感染", "腹腔膿腫", "腸粘連", "出血"],
+    correct: 0,
+    explanation: "急性闌尾炎術後最常見併發症為切口感染。"
+});
+
+// 題目486
+fullQuestionBank.push({
+    question: "486. 使用胰島素時，若注射部位出現紅腫、硬結，可能是？",
+    options: ["過敏反應或感染", "劑量過大", "胰島素失效", "正常現象"],
+    correct: 0,
+    explanation: "注射部位紅腫硬結可能為局部過敏或感染，需更換部位並觀察。"
+});
+
+// 題目487
+fullQuestionBank.push({
+    question: "487. 下列哪項是肺結核的常見症狀？",
+    options: ["午後低熱、盜汗、乏力", "高熱寒戰", "咯大量膿痰", "胸痛"],
+    correct: 0,
+    explanation: "肺結核全身症狀包括午後低熱、盜汗、乏力、消瘦等。"
+});
+
+// 題目488
+fullQuestionBank.push({
+    question: "488. 使用卡託普利時，若出現乾咳，可考慮換用？",
+    options: ["氯沙坦", "硝苯地平", "氫氯噻嗪", "美托洛爾"],
+    correct: 0,
+    explanation: "ACEI類（卡託普利）乾咳不耐受時，可換用ARB類（氯沙坦 Losartan）。"
+});
+
+// 題目489
+fullQuestionBank.push({
+    question: "489. 下列哪項是正常心電圖的P波意義？",
+    options: ["心房除極", "心室除極", "心室復極", "心房復極"],
+    correct: 0,
+    explanation: "P波代表心房除極的電位變化。"
+});
+
+// 題目490
+fullQuestionBank.push({
+    question: "490. 使用華法林期間，應避免同時使用何種藥物以免增加出血風險？",
+    options: ["阿司匹林", "青黴素", "維生素C", "鈣劑"],
+    correct: 0,
+    explanation: "阿司匹林 (Ácido acetilsalicílico) 抑制血小板，與華法林合用顯著增加出血風險。"
+});
+
+// 題目491
+fullQuestionBank.push({
+    question: "491. 下列哪項是急性胰腺炎病人腹痛的特點？",
+    options: ["持續性劇痛，向腰背部放射", "陣發性絞痛", "轉移性腹痛", "飢餓痛"],
+    correct: 0,
+    explanation: "急性胰腺炎腹痛多為持續性劇痛，位於上腹，向腰背部放射。"
+});
+
+// 題目492
+fullQuestionBank.push({
+    question: "492. 使用去乙醯毛花苷（西地蘭）時，若心率＜60次/分，應？",
+    options: ["停藥並通知醫生", "繼續用藥", "增加劑量", "加速滴注"],
+    correct: 0,
+    explanation: "強心苷可致心動過緩，心率＜60次/分應暫停給藥。"
+});
+
+// 題目493
+fullQuestionBank.push({
+    question: "493. 下列哪項是正常腦脊液的特點？",
+    options: ["無色透明，無紅細胞", "黃色渾濁", "血性", "有核細胞增多"],
+    correct: 0,
+    explanation: "正常腦脊液為無色透明，不含紅細胞，白細胞少。"
+});
+
+// 題目494
+fullQuestionBank.push({
+    question: "494. 使用阿托品時，下列哪項不是其禁忌症？",
+    options: ["青光眼", "前列腺增生", "心動過緩", "幽門梗阻"],
+    correct: 2,
+    explanation: "阿托品 (Atropina) 可用於治療心動過緩，青光眼、前列腺增生、幽門梗阻禁用。"
+});
+
+// 題目495
+fullQuestionBank.push({
+    question: "495. 下列哪項是手術後肺不張的處理措施？",
+    options: ["鼓勵深呼吸、咳痰", "應用鎮咳藥", "大量輸液", "平臥位"],
+    correct: 0,
+    explanation: "肺不張需促進排痰，可鼓勵深呼吸、拍背、霧化吸入。"
+});
+
+// 題目496
+fullQuestionBank.push({
+    question: "496. 使用甲硝唑時，應避免飲酒，原因是？",
+    options: ["引起雙硫侖樣反應", "影響藥效", "增加肝毒性", "增加胃腸反應"],
+    correct: 0,
+    explanation: "甲硝唑 (Metronidazol) 抑制乙醛脫氫酶，飲酒後可致乙醛蓄積，出現雙硫侖樣反應。"
+});
+
+// 題目497
+fullQuestionBank.push({
+    question: "497. 下列哪項是腎病症候群最常見的併發症？",
+    options: ["感染", "血栓形成", "急性腎衰竭", "電解質紊亂"],
+    correct: 0,
+    explanation: "腎病症候群因免疫球蛋白丟失、營養不良，易發生感染，是常見併發症。"
+});
+
+// 題目498
+fullQuestionBank.push({
+    question: "498. 使用氯氮平時，若出現發熱、咽痛，應首先考慮？",
+    options: ["粒細胞缺乏", "感染", "過敏", "藥物熱"],
+    correct: 0,
+    explanation: "氯氮平 (Clozapina) 致粒細胞缺乏時，可表現為發熱、咽痛，需立即查血常規。"
+});
+
+// 題目499
+fullQuestionBank.push({
+    question: "499. 下列哪項是急性腦梗死超早期溶栓治療的時間窗？",
+    options: ["發病3小時內", "發病6小時內", "發病12小時內", "發病24小時內"],
+    correct: 0,
+    explanation: "靜脈溶栓時間窗一般為發病3小時內（部分可延至4.5小時）。"
+});
+
+// 題目500
+fullQuestionBank.push({
+    question: "500. 使用胰島素泵的病人，應定期監測？",
+    options: ["血糖、酮體", "胰島素濃度", "注射部位", "以上皆是"],
+    correct: 3,
+    explanation: "胰島素泵使用者需監測血糖、酮體（預防酮症酸中毒），檢查注射部位有無感染。"
+});
+        // --------------------------------------------------------------
+        // 以下為頁面邏輯 (變數定義、事件監聽、渲染函數等)
+        // --------------------------------------------------------------
+        let previousIds = [];
+        const MAX_HISTORY = 15;
+        let currentQuestionIndex = 0;
+        let selectedOption = null;
+        let submitted = false;
+
+        const questionEl = document.getElementById('questionText');
+        const optionsEl = document.getElementById('optionsContainer');
+        const submitBtn = document.getElementById('submitBtn');
+        const feedbackArea = document.getElementById('feedbackArea');
+        const resultIcon = document.getElementById('resultIcon');
+        const explanationText = document.getElementById('explanationText');
+        const nextBtn = document.getElementById('nextBtn');
+        const historyTip = document.getElementById('historyTip');
+
+        function renderQuestion() {
+            const q = fullQuestionBank[currentQuestionIndex];
+            if (!q) return;
+            questionEl.innerText = q.question;
+
+            let optsHtml = '';
+            const letters = ['A', 'B', 'C', 'D'];
+            q.options.forEach((opt, idx) => {
+                let selectedClass = (selectedOption === idx && !submitted) ? 'selected' : '';
+                let disabledClass = submitted ? 'disabled-option' : '';
+                optsHtml += `<div class="option-item ${selectedClass} ${disabledClass}" data-opt-index="${idx}">
+                    <span class="option-prefix">${letters[idx]}</span> ${opt}
+                </div>`;
+            });
+            optionsEl.innerHTML = optsHtml;
+
+            if (submitted) {
+                const isCorrect = (selectedOption === q.correct);
+                const correctLetter = letters[q.correct];
+                const correctText = q.options[q.correct];
+                resultIcon.innerHTML = isCorrect ? '<span class="correct-icon">✓ 答對了彤彤好棒</span>' : '<span class="wrong-icon">✗ 答錯了繼續加油</span>';
+                explanationText.innerText = q.explanation + ` 正確選項: ${correctLetter}. ${correctText}`;
+                feedbackArea.style.display = 'block';
+            } else {
+                feedbackArea.style.display = 'none';
+            }
+
+            submitBtn.disabled = !(!submitted && selectedOption !== null);
+            historyTip.innerText = `📌 最近${previousIds.length}題不重複`;
+        }
+
+        optionsEl.addEventListener('click', (e) => {
+            const optDiv = e.target.closest('.option-item');
+            if (!optDiv) return;
+            if (submitted) return;
+            const idx = optDiv.dataset.optIndex;
+            if (idx !== undefined) {
+                selectedOption = parseInt(idx);
+                renderQuestion();
+            }
+        });
+
+        submitBtn.addEventListener('click', () => {
+            if (submitted || selectedOption === null) return;
+            submitted = true;
+            if (!previousIds.includes(currentQuestionIndex)) {
+                previousIds.push(currentQuestionIndex);
+                if (previousIds.length > MAX_HISTORY) previousIds.shift();
+            }
+            renderQuestion();
+        });
+
+        function getRandomDistinctIndex() {
+            if (fullQuestionBank.length <= MAX_HISTORY + 1) {
+                return Math.floor(Math.random() * fullQuestionBank.length);
+            }
+            let attempts = 0;
+            const maxAttempts = 5000;
+            let newIdx;
+            do {
+                newIdx = Math.floor(Math.random() * fullQuestionBank.length);
+                attempts++;
+                if (attempts > maxAttempts) break;
+            } while (previousIds.includes(newIdx) || newIdx === currentQuestionIndex);
+            return newIdx;
+        }
+
+        function loadNextQuestion() {
+            selectedOption = null;
+            submitted = false;
+            currentQuestionIndex = getRandomDistinctIndex();
+            renderQuestion();
+        }
+
+        nextBtn.addEventListener('click', () => {
+            loadNextQuestion();
+        });
+
+        // 初始化
+        (function init() {
+            if (fullQuestionBank.length === 0) {
+                questionEl.innerText = '題庫載入失敗，請檢查數據';
+                return;
+            }
+            currentQuestionIndex = Math.floor(Math.random() * fullQuestionBank.length);
+            previousIds.push(currentQuestionIndex);
+            renderQuestion();
+        })();
+
+    })(); // IIFE 結束
+    </script>
+</body>
+</html>
