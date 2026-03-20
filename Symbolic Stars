@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>八字神煞查询 | 四柱全备·原局流年分明</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background: #f7f3ee;
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans', system-ui, -apple-system, 'Inter', 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #2c2418;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #fffef7;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #e9ddd0;
+        }
+        .header {
+            background: linear-gradient(135deg, #2d2b26 0%, #3e362c 100%);
+            padding: 1.5rem 2rem;
+            color: #fbf5e8;
+            border-bottom: 3px solid #c7a55b;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.9rem;
+            letter-spacing: 2px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .header h1 small {
+            font-size: 0.8rem;
+            background: #5f4c35;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-weight: normal;
+        }
+        .sub {
+            margin-top: 8px;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        .input-panel {
+            background: #fdf9f2;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e7dbcd;
+        }
+        .pillar-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 1.2rem;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .pillar-group {
+            display: flex;
+            gap: 0.8rem;
+            background: #fef6ea;
+            padding: 0.6rem 1.2rem;
+            border-radius: 3rem;
+            box-shadow: inset 0 0 0 1px #efe0cf;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 70px;
+        }
+        .input-group label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8b765c;
+            margin-bottom: 2px;
+        }
+        select {
+            background: white;
+            border: 1px solid #d9cdbc;
+            border-radius: 40px;
+            padding: 6px 12px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            color: #2c2418;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+        }
+        select:focus {
+            border-color: #b48c48;
+            box-shadow: 0 0 0 2px rgba(180,140,72,0.2);
+        }
+        .flow-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+            margin-top: 0.5rem;
+            justify-content: space-between;
+        }
+        .query-btn {
+            background: #b48c48;
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 8px 28px;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .query-btn:hover {
+            background: #9c723a;
+            transform: scale(0.97);
+        }
+        .result-area {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1.2rem;
+            min-height: 300px;
+        }
+        .card {
+            background: white;
+            border-radius: 1.2rem;
+            border-left: 6px solid #dbb87c;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+        .card-header {
+            background: #fef6ea;
+            padding: 0.7rem 1.2rem;
+            font-weight: 700;
+            font-size: 1.05rem;
+            border-bottom: 1px solid #f0e2d2;
+            color: #4e3a26;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .badge {
+            font-size: 0.7rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: normal;
+        }
+        .card-content {
+            padding: 1rem 1.2rem;
+            font-size: 0.9rem;
+            line-height: 1.45;
+            color: #3c2e20;
+        }
+        .empty-msg, .error-msg {
+            text-align: center;
+            padding: 3rem;
+            color: #b9aa96;
+            font-style: italic;
+        }
+        .error-msg {
+            color: #b15341;
+            background: #fff2ef;
+            border-radius: 2rem;
+        }
+        footer {
+            background: #f1ebe2;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #7f6b53;
+            border-top: 1px solid #e2d4c4;
+        }
+        @media (max-width: 750px) {
+            .pillar-group {
+                flex-wrap: wrap;
+                width: 100%;
+            }
+            .pillar-row {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📜 神煞探微 <small>四柱全参·原局流年分判</small></h1>
+        <div class="sub">年柱·月柱·日柱·时柱｜明确标注「原局」「流年」「两者皆有」｜杜绝自见</div>
+    </div>
+    <div class="input-panel">
+        <div class="pillar-row">
+            <div class="pillar-group">
+                <div class="input-group"><label>年干</label><select id="yearGan"></select></div>
+                <div class="input-group"><label>年支</label><select id="yearZhi"></select></div>
+                <div class="input-group"><label>月干</label><select id="monthGan"></select></div>
+                <div class="input-group"><label>月支</label><select id="monthZhi"></select></div>
+            </div>
+            <div class="pillar-group">
+                <div class="input-group"><label>日干</label><select id="dayGan"></select></div>
+                <div class="input-group"><label>日支</label><select id="dayZhi"></select></div>
+                <div class="input-group"><label>时支</label><select id="hourZhi"></select></div>
+            </div>
+        </div>
+        <div class="flow-row">
+            <div class="input-group"><label>流年地支</label><select id="flowYearZhi"></select></div>
+            <div class="input-group"><label>性别</label><select id="gender"><option value="male">男 (阳)</option><option value="female">女 (阴)</option></select></div>
+            <button class="query-btn" id="queryBtn">🔮 推演神煞</button>
+        </div>
+    </div>
+    <div id="resultContainer" class="result-area">
+        <div class="empty-msg">✨ 填写四柱及流年，点击推演，即见神煞 ✨</div>
+    </div>
+    <footer>依据《神煞大全》古诀 · 区分原局四柱与流年影响 · 避免自身见自身的无效判断</footer>
+</div>
+<script>
+    // ----- 天干地支基础数据 ------
+    const ganList = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    const zhiList = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    
+    function fillSelect(selectId, arr) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        select.innerHTML = '';
+        arr.forEach(v => {
+            const opt = document.createElement('option');
+            opt.value = v;
+            opt.textContent = v;
+            select.appendChild(opt);
+        });
+    }
+    fillSelect('yearGan', ganList);
+    fillSelect('yearZhi', zhiList);
+    fillSelect('monthGan', ganList);
+    fillSelect('monthZhi', zhiList);
+    fillSelect('dayGan', ganList);
+    fillSelect('dayZhi', zhiList);
+    fillSelect('hourZhi', zhiList);
+    fillSelect('flowYearZhi', zhiList);
+    // 默认示例：甲子年 丙寅月 甲子日 子时 流年午
+    document.getElementById('yearGan').value = '甲';
+    document.getElementById('yearZhi').value = '子';
+    document.getElementById('monthGan').value = '丙';
+    document.getElementById('monthZhi').value = '寅';
+    document.getElementById('dayGan').value = '甲';
+    document.getElementById('dayZhi').value = '子';
+    document.getElementById('hourZhi').value = '子';
+    document.getElementById('flowYearZhi').value = '午';
+    document.getElementById('gender').value = 'male';
+
+    function ganIndex(g) { return ganList.indexOf(g); }
+    function zhiIndex(z) { return zhiList.indexOf(z); }
+
+    // 纳音五行 (年柱)
+    function getNaYinWuXing(yearGan, yearZhi) {
+        const ganIdx = ganIndex(yearGan);
+        const zhiIdx = zhiIndex(yearZhi);
+        if (ganIdx === -1 || zhiIdx === -1) return '土';
+        const order = (ganIdx * 12 + zhiIdx) % 60;
+        const table = [
+            "金","金","火","火","木","木","木","水","水","水","土","土",
+            "火","火","火","土","土","土","金","金","金","木","木","木",
+            "水","水","水","土","土","土","火","火","火","金","金","金",
+            "木","木","木","水","水","水","土","土","土","火","火","火",
+            "金","金","金","木","木","木","水","水","水","土","土","土"
+        ];
+        return table[order] || "土";
+    }
+
+    // 通用三合局查地支
+    const sanHeGroups = { '申子辰':'寅','寅午戌':'申','巳酉丑':'亥','亥卯未':'巳' };
+    function getSanHeMa(zhi) {
+        for (let [group, ma] of Object.entries(sanHeGroups)) if (group.includes(zhi)) return ma;
+        return '';
+    }
+
+    // 辅助：检查某地支是否出现在四柱，排除某个特定柱（避免自见）
+    function inFourZhiExclude(excludeZhi, targetZhi, yearZhi, monthZhi, dayZhi, hourZhi) {
+        const allZhi = [yearZhi, monthZhi, dayZhi, hourZhi];
+        // 排除与源柱相同的地支（如果源柱本身就是targetZhi，则不应算）
+        for (let z of allZhi) {
+            if (z === targetZhi && z !== excludeZhi) return true;
+        }
+        return false;
+    }
+
+    // 核心计算
+    function computeShenSha(params) {
+        const { yearGan, yearZhi, monthGan, monthZhi, dayGan, dayZhi, hourZhi, flowZhi, gender } = params;
+        const results = [];
+        if ([yearGan, yearZhi, monthGan, monthZhi, dayGan, dayZhi, hourZhi, flowZhi].some(v => !v)) return results;
+
+        function addResult(name, desc, type, origin) { results.push({ name, desc, type, origin }); }
+
+        // ----- 1. 天乙贵人 (日干/年干，允许自坐)
+        const tianyiMap = { '甲':'丑未','乙':'子申','丙':'亥酉','丁':'亥酉','戊':'丑未','己':'子申','庚':'丑未','辛':'寅午','壬':'卯巳','癸':'卯巳' };
+        function isTianYi(gan, zhi) { return (tianyiMap[gan] || '').includes(zhi); }
+        let tianyiList = [];
+        if (isTianYi(dayGan, dayZhi)) tianyiList.push(`日支${dayZhi}`);
+        if (isTianYi(dayGan, yearZhi)) tianyiList.push(`年支${yearZhi}`);
+        if (isTianYi(dayGan, monthZhi)) tianyiList.push(`月支${monthZhi}`);
+        if (isTianYi(dayGan, hourZhi)) tianyiList.push(`时支${hourZhi}`);
+        if (isTianYi(yearGan, dayZhi)) tianyiList.push(`年干见日支${dayZhi}`);
+        if (tianyiList.length) addResult('天乙贵人', `原局${tianyiList.join('、')}。人缘佳，遇难有救，逢凶化吉。`, '吉', '原局');
+
+        // 2. 天德贵人 (月支+天干)
+        const tianDe = { '寅':'丁','卯':'申','辰':'壬','巳':'辛','午':'亥','未':'甲','申':'癸','酉':'寅','戌':'丙','亥':'乙','子':'巳','丑':'庚' };
+        let tianDeGan = tianDe[monthZhi];
+        let tianDeHit = [];
+        if (tianDeGan && tianDeGan === yearGan) tianDeHit.push('年干');
+        if (tianDeGan && tianDeGan === monthGan) tianDeHit.push('月干');
+        if (tianDeGan && tianDeGan === dayGan) tianDeHit.push('日干');
+        if (tianDeHit.length) addResult('天德贵人', `原局月支${monthZhi}得天德${tianDeGan}，见于${tianDeHit.join('、')}。慈祥仁厚，逢凶化吉。`, '吉', '原局');
+        // 天德合
+        const tianDeHeMap = { '寅':'壬','卯':'巳','辰':'丁','巳':'丙','午':'寅','未':'己','申':'戊','酉':'亥','戌':'辛','亥':'庚','子':'申','丑':'乙' };
+        let tianDeHeGan = tianDeHeMap[monthZhi];
+        if (tianDeHeGan && (tianDeHeGan === yearGan || tianDeHeGan === monthGan || tianDeHeGan === dayGan))
+            addResult('天德合', `原局月支${monthZhi}与天干${tianDeHeGan}合，得贵人庇佑。`, '吉', '原局');
+        
+        // 3. 月德贵人 & 月德合
+        const yueDeMap = { '寅':'丙','午':'丙','戌':'丙','申':'壬','子':'壬','辰':'壬','亥':'甲','卯':'甲','未':'甲','巳':'庚','酉':'庚','丑':'庚' };
+        let yueDeGan = yueDeMap[monthZhi];
+        if (yueDeGan && (yueDeGan === yearGan || yueDeGan === monthGan || yueDeGan === dayGan))
+            addResult('月德贵人', `原局月支${monthZhi}见天干${yueDeGan}，心地善良，处世无忧。`, '吉', '原局');
+        const yueDeHeGroup = { '寅午戌':'辛','申子辰':'丁','巳酉丑':'乙','亥卯未':'己' };
+        for (let [group, gan] of Object.entries(yueDeHeGroup)) {
+            if (group.includes(monthZhi) && (gan === yearGan || gan === monthGan || gan === dayGan))
+                addResult('月德合', `原局月支${monthZhi}与${gan}合，得月德助益。`, '吉', '原局');
+        }
+
+        // 4. 天赦日
+        const tianShe = { '寅卯辰':'戊寅','巳午未':'甲午','申酉戌':'戊申','亥子丑':'甲子' };
+        let seasonKey = '';
+        if (['寅','卯','辰'].includes(monthZhi)) seasonKey = '寅卯辰';
+        else if (['巳','午','未'].includes(monthZhi)) seasonKey = '巳午未';
+        else if (['申','酉','戌'].includes(monthZhi)) seasonKey = '申酉戌';
+        else seasonKey = '亥子丑';
+        if (tianShe[seasonKey] === (dayGan+dayZhi)) addResult('天赦日', `原局生于${tianShe[seasonKey]}日，赦免灾厄，逢凶化吉。`, '吉', '原局');
+
+        // 5. 禄神 (允许自坐)
+        const luMap = { '甲':'寅','乙':'卯','丙':'巳','丁':'午','戊':'巳','己':'午','庚':'申','辛':'酉','壬':'亥','癸':'子' };
+        let luZhi = luMap[dayGan];
+        let luPos = [];
+        if (luZhi === yearZhi) luPos.push('年支');
+        if (luZhi === monthZhi) luPos.push('月支');
+        if (luZhi === dayZhi) luPos.push('日支');
+        if (luZhi === hourZhi) luPos.push('时支');
+        if (luPos.length) addResult('禄神', `原局日干${dayGan}见${luZhi}于${luPos.join('、')}，主福禄财丰，身体健康。`, '吉', '原局');
+
+        // 6. 驿马 (年支查，排除年支自身；日支查排除日支自身)
+        let ym = getSanHeMa(yearZhi);
+        let ymOrig = [], ymFlow = false;
+        if (ym && inFourZhiExclude(yearZhi, ym, yearZhi, monthZhi, dayZhi, hourZhi)) ymOrig.push(`原局${ym}见于四柱`);
+        if (ym && ym === flowZhi) ymFlow = true;
+        let ymDesc = [];
+        if (ymOrig.length) ymDesc.push(ymOrig.join('；'));
+        if (ymFlow) ymDesc.push(`流年${flowZhi}正值驿马`);
+        if (ymDesc.length) addResult('驿马', ymDesc.join('；') + '。主动迁、奔波、升职。', '中', ymFlow && ymOrig.length ? '两者皆有' : (ymFlow ? '流年' : '原局'));
+        
+        let ym2 = getSanHeMa(dayZhi);
+        if (ym2 && inFourZhiExclude(dayZhi, ym2, yearZhi, monthZhi, dayZhi, hourZhi) && ym2 !== ym) 
+            addResult('驿马(日支)', `原局日支驿马${ym2}见于四柱，一生忙碌远行。`, '中', '原局');
+
+        // 7. 太极贵人 (允许自坐)
+        let needTJ = '';
+        if (dayGan === '甲'||dayGan==='乙') needTJ = '子午';
+        else if (dayGan==='丙'||dayGan==='丁') needTJ = '卯酉';
+        else if (dayGan==='戊'||dayGan==='己') needTJ = '辰戌丑未';
+        else if (dayGan==='庚'||dayGan==='辛') needTJ = '寅亥';
+        else needTJ = '巳申';
+        let tjPos = [];
+        if (needTJ.includes(yearZhi)) tjPos.push(`年支${yearZhi}`);
+        if (needTJ.includes(monthZhi)) tjPos.push(`月支${monthZhi}`);
+        if (needTJ.includes(dayZhi)) tjPos.push(`日支${dayZhi}`);
+        if (needTJ.includes(hourZhi)) tjPos.push(`时支${hourZhi}`);
+        if (tjPos.length) addResult('太极贵人', `原局日干得${needTJ}，${tjPos.join('、')}入命，聪明好学，喜神秘文化。`, '吉', '原局');
+
+        // 8. 将星 (允许自坐，但年支将星本身可能和年支相同？实际上不会，但保留逻辑)
+        const jiangMap = { '子':'子','丑':'酉','寅':'午','卯':'卯','辰':'子','巳':'酉','午':'午','未':'卯','申':'子','酉':'酉','戌':'午','亥':'卯' };
+        let jiangZhi = jiangMap[yearZhi];
+        if (jiangZhi && [yearZhi, monthZhi, dayZhi, hourZhi].includes(jiangZhi)) addResult('将星', `原局年支将星在${jiangZhi}，见于四柱，有领导威权。`, '吉', '原局');
+
+        // 9. 学堂词馆
+        let naYin = getNaYinWuXing(yearGan, yearZhi);
+        const xuetang = { '金':'巳','木':'亥','水':'申','火':'寅','土':'申' };
+        const ciguan = { '金':'申','木':'寅','水':'亥','火':'巳','土':'亥' };
+        let xt = xuetang[naYin];
+        if (xt && [yearZhi, monthZhi, dayZhi, hourZhi].includes(xt)) addResult('学堂', `原局纳音${naYin}命学堂在${xt}，学业优秀，才华出众。`, '吉', '原局');
+        let cg = ciguan[naYin];
+        if (cg && [yearZhi, monthZhi, dayZhi, hourZhi].includes(cg)) addResult('词馆', `原局纳音词馆在${cg}，文采斐然，声名远播。`, '吉', '原局');
+
+        // 10. 国印贵人
+        const guoYin = { '甲':'戌','乙':'亥','丙':'丑','丁':'寅','戊':'丑','己':'寅','庚':'辰','辛':'巳','壬':'未','癸':'申' };
+        let gyZhi = guoYin[dayGan];
+        if (gyZhi && [yearZhi, monthZhi, dayZhi, hourZhi].includes(gyZhi)) addResult('国印贵人', `原局日干国印在${gyZhi}，诚实可靠，掌印之权。`, '吉', '原局');
+
+        // 11. 文昌贵人
+        const wenChang = { '甲':'巳','乙':'午','丙':'申','丁':'酉','戊':'申','己':'酉','庚':'亥','辛':'子','壬':'寅','癸':'卯' };
+        let wc = wenChang[dayGan];
+        if (wc && [yearZhi, monthZhi, dayZhi, hourZhi].includes(wc)) addResult('文昌贵人', `原局日干文昌在${wc}，聪明好学，利考学文章。`, '吉', '原局');
+
+        // 12. 华盖 (允许自坐)
+        const huaGai = { '寅午戌':'戌','申子辰':'辰','巳酉丑':'丑','亥卯未':'未' };
+        let hg = '';
+        for (let [k,v] of Object.entries(huaGai)) if (k.includes(yearZhi)) hg=v;
+        if (hg && [yearZhi, monthZhi, dayZhi, hourZhi].includes(hg)) addResult('华盖', `原局年支华盖在${hg}，艺术天赋，孤独清高，有宗教缘。`, '中', '原局');
+
+        // 13. 天医 (月支查，排除月支自身)
+        const tianYi = { '寅':'丑','卯':'寅','辰':'卯','巳':'辰','午':'巳','未':'午','申':'未','酉':'申','戌':'酉','亥':'戌','子':'亥','丑':'子' };
+        let ty = tianYi[monthZhi];
+        if (ty && inFourZhiExclude(monthZhi, ty, yearZhi, monthZhi, dayZhi, hourZhi)) addResult('天医', `原局月支天医在${ty}，与医道有缘，病易康复。`, '吉', '原局');
+
+        // 14. 金舆
+        const jinYu = { '甲':'辰','乙':'巳','丙':'未','丁':'申','戊':'未','己':'申','庚':'戌','辛':'亥','壬':'丑','癸':'寅' };
+        let jy = jinYu[dayGan];
+        if (jy && [yearZhi, monthZhi, dayZhi, hourZhi].includes(jy)) addResult('金舆', `原局日干金舆在${jy}，得贤妻财助，福气安泰。`, '吉', '原局');
+
+        // 15. 空亡 (日柱旬空)
+        const xunKong = { '甲子':'戌亥','甲戌':'申酉','甲申':'午未','甲午':'辰巳','甲辰':'寅卯','甲寅':'子丑' };
+        function getXun(gan,zhi) {
+            let idx = ganIndex(gan);
+            let start = Math.floor((idx*12 + zhiIndex(zhi)) / 10) * 10;
+            let startGan = ganList[start % 10];
+            let startZhi = zhiList[start % 12];
+            let key = startGan + startZhi;
+            return xunKong[key] || '';
+        }
+        let kong = getXun(dayGan, dayZhi);
+        let kongPos = [];
+        if (kong && kong.includes(yearZhi)) kongPos.push('年支');
+        if (kong && kong.includes(monthZhi)) kongPos.push('月支');
+        if (kong && kong.includes(dayZhi)) kongPos.push('日支');
+        if (kong && kong.includes(hourZhi)) kongPos.push('时支');
+        if (kongPos.length) addResult('空亡', `原局日柱旬空${kong}，见于${kongPos.join('、')}，吉神减力，凶煞亦衰。`, '凶', '原局');
+
+        // 16. 灾煞 劫煞 亡神 (年支查，排除年支自身)
+        const zaiSha = { '申子辰':'午','寅午戌':'子','巳酉丑':'卯','亥卯未':'酉' };
+        const jieSha = { '申子辰':'巳','寅午戌':'亥','巳酉丑':'寅','亥卯未':'申' };
+        const wangShen = { '申子辰':'亥','寅午戌':'巳','巳酉丑':'申','亥卯未':'寅' };
+        function getShaFromMap(map, z) { for (let [k,v] of Object.entries(map)) if (k.includes(z)) return v; return ''; }
+        let zs = getShaFromMap(zaiSha, yearZhi);
+        let zsOrig = [], zsFlow = false;
+        if (zs && inFourZhiExclude(yearZhi, zs, yearZhi, monthZhi, dayZhi, hourZhi)) zsOrig.push(`原局${zs}见于四柱`);
+        if (zs && zs === flowZhi) zsFlow = true;
+        if (zsOrig.length || zsFlow) addResult('灾煞', (zsOrig.length?zsOrig.join('；'):'') + (zsFlow?`流年${flowZhi}正值灾煞`:'') + '。防血光意外。', '凶', (zsFlow && zsOrig.length)?'两者皆有':(zsFlow?'流年':'原局'));
+        
+        let js = getShaFromMap(jieSha, yearZhi);
+        if (js && inFourZhiExclude(yearZhi, js, yearZhi, monthZhi, dayZhi, hourZhi)) addResult('劫煞', `原局年支劫煞在${js}，竞争破财，须防小人。`, '凶', '原局');
+        let ws = getShaFromMap(wangShen, yearZhi);
+        if (ws && inFourZhiExclude(yearZhi, ws, yearZhi, monthZhi, dayZhi, hourZhi)) addResult('亡神', `原局年支亡神在${ws}，城府深沉，凶则多是非官非。`, '凶', '原局');
+
+        // 17. 羊刃/飞刃/血刃/流霞
+        const yangRen = { '甲':'卯','乙':'寅','丙':'午','丁':'巳','戊':'午','己':'巳','庚':'酉','辛':'申','壬':'子','癸':'亥' };
+        let yr = yangRen[dayGan];
+        if (yr === dayZhi) addResult('羊刃', `原局日柱羊刃在${yr}，刚强好胜，刃重易灾。`, '凶', '原局');
+        if (yr) {
+            const feiMap = { '卯':'酉','寅':'申','午':'子','巳':'亥','酉':'卯','申':'寅','子':'午','亥':'巳' };
+            let fei = feiMap[yr];
+            if (fei && [yearZhi, monthZhi, dayZhi, hourZhi].includes(fei)) addResult('飞刃', `原局羊刃对冲飞刃在${fei}，血光争端之星。`, '凶', '原局');
+        }
+        const xueRen = { '寅':'丑','卯':'未','辰':'寅','巳':'申','午':'卯','未':'酉','申':'辰','酉':'戌','戌':'巳','亥':'亥','子':'午','丑':'子' };
+        let xr = xueRen[monthZhi];
+        let xrOrig = [], xrFlow = false;
+        if (xr && inFourZhiExclude(monthZhi, xr, yearZhi, monthZhi, dayZhi, hourZhi)) xrOrig.push(`原局${xr}见于四柱`);
+        if (xr && xr === flowZhi) xrFlow = true;
+        if (xrOrig.length || xrFlow) addResult('血刃', (xrOrig.length?xrOrig.join('；'):'') + (xrFlow?`流年${flowZhi}正值血刃`:'') + '。注意血光意外。', '凶', (xrFlow && xrOrig.length)?'两者皆有':(xrFlow?'流年':'原局'));
+        
+        const liuXia = { '甲':'酉','乙':'戌','丙':'未','丁':'申','戊':'巳','己':'午','庚':'辰','辛':'卯','壬':'亥','癸':'寅' };
+        let lx = liuXia[dayGan];
+        if (lx && [yearZhi, monthZhi, dayZhi, hourZhi].includes(lx)) addResult('流霞', `原局日干流霞在${lx}，男忌酒色，女防产厄血崩。`, '凶', '原局');
+
+        // 18. 桃花 (年支查，排除年支自身)
+        const taoHua = { '申子辰':'酉','寅午戌':'卯','巳酉丑':'午','亥卯未':'子' };
+        let th = getShaFromMap(taoHua, yearZhi);
+        let thOrig = [], thFlow = false;
+        if (th && inFourZhiExclude(yearZhi, th, yearZhi, monthZhi, dayZhi, hourZhi)) thOrig.push(`原局${th}见于四柱`);
+        if (th && th === flowZhi) thFlow = true;
+        if (thOrig.length || thFlow) addResult('桃花/咸池', (thOrig.length?thOrig.join('；'):'') + (thFlow?`流年${flowZhi}逢桃花`:'') + '。异性缘佳，风流多情。', '中', (thFlow && thOrig.length)?'两者皆有':(thFlow?'流年':'原局'));
+
+        // 19. 孤辰寡宿 (年支分组查，排除年支自身)
+        let group = '';
+        if (['亥','子','丑'].includes(yearZhi)) group = '亥子丑';
+        else if (['寅','卯','辰'].includes(yearZhi)) group = '寅卯辰';
+        else if (['巳','午','未'].includes(yearZhi)) group = '巳午未';
+        else group = '申酉戌';
+        const guChenMap = { '亥子丑':'寅','寅卯辰':'巳','巳午未':'申','申酉戌':'亥' };
+        const guaSuMap = { '亥子丑':'戌','寅卯辰':'丑','巳午未':'辰','申酉戌':'未' };
+        let gc = guChenMap[group];
+        let gs = guaSuMap[group];
+        if (gc && inFourZhiExclude(yearZhi, gc, yearZhi, monthZhi, dayZhi, hourZhi)) addResult('孤辰', `原局年支孤辰在${gc}，性格孤僻，男怕孤辰。`, '凶', '原局');
+        if (gs && inFourZhiExclude(yearZhi, gs, yearZhi, monthZhi, dayZhi, hourZhi)) addResult('寡宿', `原局年支寡宿在${gs}，女怕寡宿，婚姻缘薄。`, '凶', '原局');
+
+        // 20. 日柱神煞 (原局，不涉及自见问题)
+        const yinYangCuo = ['丙子','丙午','丁丑','丁未','戊寅','戊申','辛卯','辛酉','壬辰','壬戌','癸巳','癸亥'];
+        if (yinYangCuo.includes(dayGan+dayZhi)) addResult('阴阳差错', `原局日柱${dayGan+dayZhi}，婚姻不顺，与家亲不合。`, '凶', '原局');
+        const kuiGang = ['戊戌','庚辰','庚戌','壬辰'];
+        if (kuiGang.includes(dayGan+dayZhi)) addResult('魁罡', `原局日柱魁罡，聪明果断，身旺掌权，身弱易灾。`, '中', '原局');
+        const guLuan = ['甲寅','乙巳','丙午','丁巳','戊午','戊申','辛亥','壬子'];
+        if (guLuan.includes(dayGan+dayZhi)) addResult('孤鸾煞', `原局日柱孤鸾，感情多波折，晚婚或外遇。`, '凶', '原局');
+        const shiEBai = ['甲辰','乙巳','壬申','丙申','丁亥','庚辰','戊戌','癸亥','辛巳','己丑'];
+        if (shiEBai.includes(dayGan+dayZhi)) addResult('十恶大败', `原局日柱十恶大败，不善理财，败家之嫌。`, '凶', '原局');
+        const shiLing = ['甲辰','乙亥','丙辰','丁酉','戊午','庚戌','庚寅','辛亥','壬寅','癸未'];
+        if (shiLing.includes(dayGan+dayZhi)) addResult('十灵日', `原局日柱十灵日，灵慧通玄，与五术有缘。`, '吉', '原局');
+        const liuXiu = ['丙午','丁未','戊子','戊午','己丑','己未'];
+        if (liuXiu.includes(dayGan+dayZhi)) addResult('六秀日', `原局日柱六秀，聪明秀气，人缘佳。`, '吉', '原局');
+        const baZhuan = ['甲寅','乙卯','丁未','戊戌','己未','庚申','辛酉','癸丑'];
+        if (baZhuan.includes(dayGan+dayZhi)) addResult('八专', `原局日柱八专，情欲旺盛，多情风流。`, '凶', '原局');
+        const jiuChou = ['丁酉','戊子','戊午','己卯','己酉','辛卯','辛酉','壬子','壬午'];
+        if (jiuChou.includes(dayGan+dayZhi)) addResult('九丑', `原局日柱九丑，感情多纷争，易因情事招非议。`, '凶', '原局');
+        
+        // 红鸾天喜 (年支查，排除年支自身)
+        const hongLuan = { '子':'卯','丑':'寅','寅':'丑','卯':'子','辰':'亥','巳':'戌','午':'酉','未':'申','申':'未','酉':'午','戌':'巳','亥':'辰' };
+        let hl = hongLuan[yearZhi];
+        let hlOrig = [], hlFlow = false;
+        if (hl && inFourZhiExclude(yearZhi, hl, yearZhi, monthZhi, dayZhi, hourZhi)) hlOrig.push(`原局红鸾${hl}见于四柱`);
+        if (hl && hl === flowZhi) hlFlow = true;
+        if (hlOrig.length || hlFlow) addResult('红鸾', (hlOrig.length?hlOrig.join('；'):'') + (hlFlow?`流年${flowZhi}为红鸾年`:'') + '。喜事临近，利婚缘。', '吉', (hlFlow && hlOrig.length)?'两者皆有':(hlFlow?'流年':'原局'));
+        
+        const tianXi = { '子':'酉','丑':'申','寅':'未','卯':'午','辰':'巳','巳':'辰','午':'卯','未':'寅','申':'丑','酉':'子','戌':'亥','亥':'戌' };
+        let tx = tianXi[yearZhi];
+        let txOrig = [], txFlow = false;
+        if (tx && inFourZhiExclude(yearZhi, tx, yearZhi, monthZhi, dayZhi, hourZhi)) txOrig.push(`原局天喜${tx}见于四柱`);
+        if (tx && tx === flowZhi) txFlow = true;
+        if (txOrig.length || txFlow) addResult('天喜', (txOrig.length?txOrig.join('；'):'') + (txFlow?`流年${flowZhi}为天喜年`:'') + '。婚庆添喜，人缘佳。', '吉', (txFlow && txOrig.length)?'两者皆有':(txFlow?'流年':'原局'));
+
+        // 丧门吊客披麻 (流年为主，无自见问题)
+        const sangMen = { '子':'寅','丑':'卯','寅':'辰','卯':'巳','辰':'午','巳':'未','午':'申','未':'酉','申':'戌','酉':'亥','戌':'子','亥':'丑' };
+        const diaoKe = { '子':'戌','丑':'亥','寅':'子','卯':'丑','辰':'寅','巳':'卯','午':'辰','未':'巳','申':'午','酉':'未','戌':'申','亥':'酉' };
+        const piMa = { '子':'酉','丑':'戌','寅':'亥','卯':'子','辰':'丑','巳':'寅','午':'卯','未':'辰','申':'巳','酉':'午','戌':'未','亥':'申' };
+        let sm = sangMen[yearZhi];
+        let dk = diaoKe[yearZhi];
+        let pm = piMa[yearZhi];
+        if (sm && sm === flowZhi) addResult('丧门', `流年${flowZhi}正值丧门，防孝服破财，忌探病。`, '凶', '流年');
+        if (dk && dk === flowZhi) addResult('吊客', `流年${flowZhi}为吊客，防亲人生病或意外。`, '凶', '流年');
+        if (pm && pm === flowZhi) addResult('披麻', `流年${flowZhi}披麻入命，守孝或伤病，宜静。`, '凶', '流年');
+
+        // 勾绞煞 (原局，无自见问题)
+        const gouJiao = (zhi, gen) => {
+            let idx = zhiIndex(zhi);
+            let qian = zhiList[(idx+3)%12];
+            let hou = zhiList[(idx+9)%12];
+            let isYang = (idx%2===0);
+            if ((gen==='male' && isYang) || (gen==='female' && !isYang)) return {gou:qian, jiao:hou};
+            else return {gou:hou, jiao:qian};
+        };
+        let gj = gouJiao(yearZhi, gender);
+        if ((gj.gou && [yearZhi, monthZhi, dayZhi, hourZhi].includes(gj.gou)) || (gj.jiao && [yearZhi, monthZhi, dayZhi, hourZhi].includes(gj.jiao)))
+            addResult('勾绞煞', `原局命带勾绞，易口舌是非，感情不顺，官非破财。`, '凶', '原局');
+        
+        // 红艳煞 (原局)
+        const hongYan = { '甲':'午','乙':'午','丙':'寅','丁':'未','戊':'辰','己':'辰','庚':'戌','辛':'酉','壬':'子','癸':'申' };
+        let hy = hongYan[dayGan];
+        if (hy && [yearZhi, monthZhi, dayZhi, hourZhi].includes(hy)) addResult('红艳煞', `原局日干红艳在${hy}，多情风流，易有外遇情伤。`, '凶', '原局');
+        
+        // 元辰 (原局)
+        const yuanChen = (zhi, gen) => {
+            let idx = zhiIndex(zhi);
+            let isYang = (idx%2===0);
+            if ((gen==='male' && isYang) || (gen==='female' && !isYang)) return zhiList[(idx+6)%12];
+            else return zhiList[(idx+4)%12];
+        };
+        let yc = yuanChen(yearZhi, gender);
+        if (yc && [yearZhi, monthZhi, dayZhi, hourZhi].includes(yc)) addResult('元辰/大耗', `原局元辰在${yc}，是非颠倒，破财耗损。`, '凶', '原局');
+        
+        // 金神
+        if (['乙丑','己巳','癸酉'].includes(dayGan+dayZhi)) addResult('金神', `原局日柱金神，刚毅有才，宜入火乡发富贵。`, '吉', '原局');
+        
+        // 天厨贵人
+        const tianChu = { '甲':'巳','乙':'午','丙':'巳','丁':'午','戊':'申','己':'酉','庚':'亥','辛':'子','壬':'寅','癸':'卯' };
+        let tc = tianChu[dayGan];
+        if (tc && [yearZhi, monthZhi, dayZhi, hourZhi].includes(tc)) addResult('天厨贵人', `原局日干天厨在${tc}，口福佳，擅厨艺，衣食丰足。`, '吉', '原局');
+
+        return results;
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function render() {
+        const container = document.getElementById('resultContainer');
+        try {
+            const yearGan = document.getElementById('yearGan').value;
+            const yearZhi = document.getElementById('yearZhi').value;
+            const monthGan = document.getElementById('monthGan').value;
+            const monthZhi = document.getElementById('monthZhi').value;
+            const dayGan = document.getElementById('dayGan').value;
+            const dayZhi = document.getElementById('dayZhi').value;
+            const hourZhi = document.getElementById('hourZhi').value;
+            const flowZhi = document.getElementById('flowYearZhi').value;
+            const gender = document.getElementById('gender').value;
+            const params = { yearGan, yearZhi, monthGan, monthZhi, dayGan, dayZhi, hourZhi, flowZhi, gender };
+            const list = computeShenSha(params);
+            if (!list.length) {
+                container.innerHTML = '<div class="empty-msg">🌿 未查见明显神煞，或入清贵之局 🌿</div>';
+                return;
+            }
+            const typeOrder = { '吉':1, '中':2, '凶':3 };
+            list.sort((a,b)=> (typeOrder[a.type]-typeOrder[b.type]) );
+            container.innerHTML = list.map(s => {
+                let bgStyle = '';
+                if (s.type === '吉') bgStyle = 'background:#e0f0e6;color:#2a6b47';
+                else if (s.type === '凶') bgStyle = 'background:#fbeae8;color:#b64739';
+                else bgStyle = 'background:#f5efdf;color:#b28b4e';
+                let originText = '';
+                if (s.origin === '原局') originText = '📌 原局';
+                else if (s.origin === '流年') originText = '🔁 流年';
+                else if (s.origin === '两者皆有') originText = '⚡ 原局+流年';
+                return `
+                    <div class="card">
+                        <div class="card-header">
+                            <span>${escapeHtml(s.name)} <span style="font-size:0.7rem; font-weight:normal;">${originText}</span></span>
+                            <span class="badge" style="${bgStyle}">${s.type==='吉'?'吉神':(s.type==='凶'?'凶煞':'中性')}</span>
+                        </div>
+                        <div class="card-content">${escapeHtml(s.desc)}</div>
+                    </div>
+                `;
+            }).join('');
+        } catch (err) {
+            console.error(err);
+            container.innerHTML = `<div class="error-msg">⚠️ 推演时发生错误: ${err.message}<br>请检查输入或刷新页面重试</div>`;
+        }
+    }
+
+    const btn = document.getElementById('queryBtn');
+    if (btn) btn.addEventListener('click', render);
+    render();
+</script>
+</body>
+</html>
