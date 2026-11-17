@@ -163,6 +163,39 @@
     -webkit-tap-highlight-color: transparent;
   }
   .app:active { background: #e0d4f0; }
+
+  /* 機場／高鐵站地址：最次要，比酒店條再淡一級 */
+  .hub {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 10.5px;
+    line-height: 1.55;
+    color: #aab4ad;
+  }
+  .hub .tag { color: #6f7d74; font-weight: 600; white-space: nowrap; }
+  .hub .txt { border-bottom: 1px dashed #e6ebe7; }
+  .hub .app { font-size: 9.5px; padding: 1px 8px; }
+  .hub .chk { color: #1f6b38; font-weight: 600; }
+
+  /* 高鐵小卡：一程一張，只放車號／時地／座位 */
+  .train {
+    margin: 8px 0;
+    padding: 9px 11px;
+    background: #f1f8fb;
+    border: 1px solid #dceaf1;
+    border-left: 3px solid #3a7d9c;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #4a5a52;
+  }
+  .train .no { font-size: 13px; font-weight: 700; color: #2b6a8a; letter-spacing: 0.3px; }
+  .train .rt { font-weight: 600; color: #2c3e35; }
+  .train .rt .ar { color: #9aa8a0; font-weight: 400; margin: 0 4px; }
+  .train .seat { font-size: 11.5px; color: #7a8a82; }
 </style>
 </head>
 <body>
@@ -180,6 +213,11 @@
     <div class="city">昆明</div>
     <div class="move">
       <span class="pill ok">已出票</span><span class="txt-ok">✈️ CZ5403</span>　14:50–17:00　¥1180
+    </div>
+    <div class="hub">
+      <span class="tag">🛫 出發 · 珠海金灣機場</span>
+      <span class="txt">广东省珠海市金湾区三灶镇金海东路</span>
+      <a class="app" href="iosamap://path?sourceApplication=%E4%BA%91%E5%8D%97%E4%B9%8B%E6%97%85&amp;dlat=22.005746&amp;dlon=113.381288&amp;dname=%E7%8F%A0%E6%B5%B7%E9%87%91%E6%B9%BE%E6%9C%BA%E5%9C%BA&amp;dev=0&amp;t=0" title="喺 iPhone 高德地圖 App 開啟珠海金灣機場">開 App ↗</a>
     </div>
   </div>
 </div>
@@ -200,14 +238,17 @@
   <div class="badge"><span class="n">27</span><span class="w">週五</span></div>
   <div class="daybody">
     <div class="month">11月 · 昆明 → 大理</div>
+    <div class="hub">
+      <span class="tag">🚉 出發 · 昆明站</span>
+      <span class="txt">云南省昆明市官渡区太和街道北京路1号</span>
+      <a class="app" href="iosamap://path?sourceApplication=%E4%BA%91%E5%8D%97%E4%B9%8B%E6%97%85&amp;dlat=25.015771&amp;dlon=102.721732&amp;dname=%E6%98%86%E6%98%8E%E7%AB%99&amp;dev=0&amp;t=0" title="喺 iPhone 高德地圖 App 開啟昆明站">開 App ↗</a>
+    </div>
+    <div class="train">
+      <div class="no">🚄 C9502</div>
+      <div class="rt">昆明站 07:51 <span class="ar">→</span> 大理站 10:09</div>
+      <div class="seat">座位 16車 04F／04D</div>
+    </div>
     <div class="city">大理</div>
-    <div class="move">
-      <span class="pill ok">已出票</span><span class="txt-ok">🚄 C9502 城際動車</span>　07:51–10:09　2時18分
-    </div>
-    <div class="station">
-      <span class="st">昆明站 → 大理站</span>　<span class="chk">✓ 已核實：昆明站發車，唔係昆明南</span><br>
-      <span class="note">C 字頭＝城際動車組，只係列車類別，唔係另一個車站；同 G／D 字頭往大理共用昆明站。大理係途經站，10:09 落車，唔好坐過龍去臨滄。</span>
-    </div>
     <div class="station">
       <span class="st">🚗 大理站取車 10:30</span>　<span class="pill ok">已訂</span>　商家送車到站<br>
       <span class="note">五菱繽果（純電 · 4座 · 續航203–410km）· 11/27 10:30 → 11/30 17:30 · 3天7小時 · ¥564（已減¥92）· 不限里程 · 押金¥3000免收</span><br>
@@ -257,13 +298,6 @@
   <div class="daybody">
     <div class="month">11月 · 大理 → 麗江</div>
     <div class="city">麗江</div>
-    <div class="move">
-      <span class="pill ok">已訂</span><span class="txt-ok">🚗 自駕 五菱繽果</span>　大理 → 麗江
-      <span class="meta">同程租車 · 異地還車 · ¥564</span>
-    </div>
-    <div class="station">
-      <span class="st">🏁 麗江站還車 11/30 17:30</span>　<span class="note">商家到站取車 · 駕駛員 WONG IOKPAN（回鄉證＋內地駕照正本）</span>
-    </div>
   </div>
 </div>
 <div class="stay ok">
@@ -283,14 +317,20 @@
   <div class="badge"><span class="n">30</span><span class="w">週一</span></div>
   <div class="daybody">
     <div class="month">11月 · 麗江 → 昆明</div>
-    <div class="city">昆明</div>
-    <div class="move">
-      <span class="pill ok">已出票</span><span class="txt-ok">🚄 C88 城際動車</span>　麗江 18:41 → 昆明 22:04　3時23分
-    </div>
     <div class="station">
-      <span class="st">訂單 E886636588 · 2人已支付</span>　<span class="note">二等座 16車 12D（過道）／12F（靠窗）· 各 ¥190（8.7折）· 共 ¥380 · 當日當次有效</span><br>
-      <span class="chk">✓ 17:30 還車 → 18:41 開車，有約 1 小時緩衝；建議 17:00 前到麗江站交車</span>
+      <span class="st">🏁 麗江站還車 17:30</span>　<span class="note">商家到站取車 · 建議 17:00 前到站交車</span>
     </div>
+    <div class="hub">
+      <span class="tag">🚉 出發／還車 · 麗江站</span>
+      <span class="txt">云南省丽江市玉龙纳西族自治县黄山镇上吉路</span>
+      <a class="app" href="iosamap://path?sourceApplication=%E4%BA%91%E5%8D%97%E4%B9%8B%E6%97%85&amp;dlat=26.810925&amp;dlon=100.252229&amp;dname=%E4%B8%BD%E6%B1%9F%E7%AB%99&amp;dev=0&amp;t=0" title="喺 iPhone 高德地圖 App 開啟麗江站">開 App ↗</a>
+    </div>
+    <div class="train">
+      <div class="no">🚄 C88</div>
+      <div class="rt">麗江站 18:41 <span class="ar">→</span> 昆明站 22:04</div>
+      <div class="seat">座位 16車 12D／12F</div>
+    </div>
+    <div class="city">昆明</div>
   </div>
 </div>
 <div class="stay ok">
@@ -313,6 +353,15 @@
     <div class="city">珠海</div>
     <div class="move">
       <span class="pill ok">已出票</span><span class="txt-ok">✈️ CZ3790</span>　10:50–12:50　¥1140
+    </div>
+    <div class="hub">
+      <span class="tag">🛫 出發 · 昆明長水國際機場</span>
+      <span class="txt">云南省昆明市官渡区大板桥街道长水村</span>
+      <a class="app" href="iosamap://path?sourceApplication=%E4%BA%91%E5%8D%97%E4%B9%8B%E6%97%85&amp;dlat=25.101086&amp;dlon=102.931434&amp;dname=%E6%98%86%E6%98%8E%E9%95%BF%E6%B0%B4%E5%9B%BD%E9%99%85%E6%9C%BA%E5%9C%BA&amp;dev=0&amp;t=0" title="喺 iPhone 高德地圖 App 開啟昆明長水國際機場">開 App ↗</a>
+    </div>
+    <div class="station">
+      <span class="chk">✓ 已核實：CZ3790 係 昆明長水(KMG) → 珠海金灣(ZUH)</span><br>
+      <span class="note">宜尚酒店喺長水航城凌雲里，離機場約2.3km／8分鐘車程，有免費接送機，朝早10:50機唔使趕。</span>
     </div>
   </div>
 </div>
