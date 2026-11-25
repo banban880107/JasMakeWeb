@@ -119,8 +119,13 @@
   /* 打橫：將成個畫面轉 90 度並自動撐滿 */
   body.rot { overflow: hidden; }
   body.rot .wrap {
-    position: fixed; inset: 0;
-    transform: rotate(90deg);
+    /* 舊寫法用 inset:0 + margin:0，元素左上角貼住 (0,0)，
+       旋轉前個中心喺 (100vh/2, 100vw/2)，同 viewport 中心 (100vw/2, 100vh/2) 唔同，
+       rotate 又只會繞自己中心轉 → 成個畫面偏移 (100vh-100vw)/2。
+       改成先 top/left 50% + translate(-50%,-50%) 置中，再 rotate 就啱。 */
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
     transform-origin: center center;
     width: 100vh; height: 100vw;
     max-width: 100vh; max-height: 100vw;
@@ -475,8 +480,8 @@
 
       const t = deathT;
       const fade = Math.max(0, 1 - t / 200);
-      const sw = dispW * 0.30, sh = dispH * 0.30;     // 原圖 30% 大細
-      const fx = rx + t * 0.42 + Math.sin(t * 0.09) * 3;
+      const sw = dispW * 0.45, sh = dispH * 0.45;     // 原圖 45% 大細（再大啲）
+      const fx = rx + sw * 0.22 + t * 0.42 + Math.sin(t * 0.09) * 3;
       const fy = ry - 6 - t * 0.75;
 
       ctx.save();
@@ -492,7 +497,7 @@
       // 靈魂本體：原圖 30%、帶淡藍光暈，睇得出係同一隻小熊
       ctx.globalAlpha = fade * 0.95;
       ctx.shadowColor = 'rgba(150,195,255,.95)';
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 14;
       ctx.drawImage(SOUL, fx - sw / 2, fy - sh / 2, sw, sh);
       ctx.restore();
     }
