@@ -196,6 +196,21 @@
   .train .rt { font-weight: 600; color: #2c3e35; }
   .train .rt .ar { color: #9aa8a0; font-weight: 400; margin: 0 4px; }
   .train .seat { font-size: 11.5px; color: #7a8a82; }
+
+  /* 行程點定位：最次要，同酒店地址同樣三粒掣 */
+  .poi {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 10.5px;
+    line-height: 1.55;
+    color: #aab4ad;
+  }
+  .poi .tag { color: #6f7d74; font-weight: 600; white-space: nowrap; }
+  .poi .txt { border-bottom: 1px dashed #e6ebe7; }
+  .poi .copy, .poi .doc, .poi .app { font-size: 9.5px; padding: 1px 8px; }
 </style>
 </head>
 <body>
@@ -218,6 +233,16 @@
       <span class="tag">🛫 出發 · 珠海金灣機場</span>
       <span class="txt">广东省珠海市金湾区三灶镇金海东路</span>
       <a class="app" href="iosamap://path?sourceApplication=%E4%BA%91%E5%8D%97%E4%B9%8B%E6%97%85&amp;dlat=22.005746&amp;dlon=113.381288&amp;dname=%E7%8F%A0%E6%B5%B7%E9%87%91%E6%B9%BE%E6%9C%BA%E5%9C%BA&amp;dev=0&amp;t=0" title="喺 iPhone 高德地圖 App 開啟珠海金灣機場">開 App ↗</a>
+    </div>
+    <div class="station">
+      <span class="st">🌃 落機後 · 先去酒店放低行李</span>　<span class="note">17:00 落地 → 格林豪泰(火車站店) → 夜逛南強街巷</span>
+    </div>
+    <div class="poi">
+      <span class="tag">🚶 南強步行街 · 東入口</span>
+      <span class="txt">云南省昆明市五华区护国街道南强街88号（东门 · 护国路侧）</span>
+      <button class="copy" type="button" data-copy="云南省昆明市五华区护国街道南强街88号南强街巷东门" onclick="copyAddr(this)">複製</button>
+      <a class="doc" href="https://uri.amap.com" target="_blank" rel="noopener" title="開啟高德網頁版（uri.amap.com）">跳轉 ↗</a>
+      <a class="app" href="iosamap://path?sourceApplication=%E4%BA%91%E5%8D%97%E4%B9%8B%E6%97%85&amp;dlat=25.034831&amp;dlon=102.715173&amp;dname=%E5%8D%97%E5%BC%BA%E8%A1%97%E5%B7%B7%E4%B8%9C%E9%97%A8&amp;dev=0&amp;t=0" title="喺 iPhone 高德地圖 App 開啟南強街巷東門">開 App ↗</a>
     </div>
   </div>
 </div>
@@ -297,6 +322,10 @@
   <div class="badge"><span class="n">29</span><span class="w">週日</span></div>
   <div class="daybody">
     <div class="month">11月 · 大理 → 麗江</div>
+    <div class="station">
+      <span class="st">⛰️ 玉龍雪山（朝早）</span>　<span class="note">冰川公園大索道 · 上午時段</span><br>
+      <span class="note">註：大索道票提前 7 日 20:00 放（11/22 已過），現走官方候補；大理自駕往雪山約 3.5h，早時段要極早出發</span>
+    </div>
     <div class="city">麗江</div>
   </div>
 </div>
