@@ -141,6 +141,8 @@
   body.rot .tip { font-size: 11px; }
   .hard-tag { display: none; color: #c0392b; font-weight: 700; letter-spacing: .5px; }
   .hard-tag.on { display: inline-block; }
+  .cut-tag { display: none; color: #e67e22; font-weight: 700; letter-spacing: .5px; }
+  .cut-tag.on { display: inline-block; }
 </style>
 </head>
 <body>
@@ -148,7 +150,8 @@
   <div class="hud">
     <span>得分 <b id="score">0</b></span>
     <span>最高 <b id="best">0</b></span>
-    <span id="hardTag" class="hard-tag">⚡ HARDCORE</span>
+    <span id="hardTag" class="hard-tag">⚡ 反應極限</span>
+    <span id="cutTag" class="cut-tag">⏱ 間隔 ×1.00</span>
   </div>
   <div class="canvas-box">
     <canvas id="game" width="1600" height="480"></canvas>
@@ -161,7 +164,8 @@
   <div class="tip">
     <span class="kb-line"><kbd>空格</kbd> / <kbd>↑</kbd> = 跳　·　按住 <kbd>↓</kbd> = 蹲低（雀仔一定要蹲，跳唔到过）<br></span>
     <span class="touch-line" style="display:none;">点「跳 ↑」跳过仙人掌，按住「蹲低 ↓」躲雀仔（一定要蹲）<br></span>
-    撞到仙人掌或雀仔就 GAME OVER，再点一下即可重新开始
+    撞到仙人掌或雀仔就 GAME OVER，再点一下即可重新开始<br>
+    <span style="color:#e67e22;">⚠ 400 分起間隔時間線性收緊，1200 分到極限 ×0.50（後段幾乎必死）</span>
   </div>
 </div>
 <button id="rotBtn" title="打橫／打直">⟳</button>
@@ -180,6 +184,7 @@
   const bestEl = document.getElementById('best');
   const hiEl = document.getElementById('hiscore');
   const hardTag = document.getElementById('hardTag');
+  const cutTag = document.getElementById('cutTag');
 
   const C = {
     ink: '#535353',
@@ -253,6 +258,15 @@
 
   function spawnObstacle(force) {
     spawnTotal++;       // 每次呼叫 = 一個障礙
+    if (force === 'bird') {
+      // 換鍵關專用：強制雀仔（一樣係必蹲高度），計入配額等 20% 唔會走樣
+      birdTotal++;
+      obstacles.push({
+        type: 'bird', x: W + 10, y: GROUND - 32,
+        w: 40, h: 20, wing: 0, passed: false
+      });
+      return;
+    }
     if (force === 'cactus') {
       // 連跳關專用：強制單株、偏矮仙人掌
       // 兩次都係純「跳」就得，唔會夾雜要蹲嘅雀仔，亦唔會闊到過唔到
@@ -330,7 +344,11 @@
     spawnTotal = 0;
     birdTotal = 0;
     lastPattern = 'steady';
+    lastType = 'cactus';
+    switchPending = false;
     hardTag.classList.remove('on');
+    cutTag.classList.remove('on');
+    cutTag.textContent = '⏱ 間隔 ×1.00';
     state = 'play';
     for (let i = 0; i < 3; i++) spawnCloud();
     nextObstacle = 60;
@@ -339,114 +357,148 @@
   let nextObstacle = 60;
   let comboLeft = 0;   // 連跳組仲要出幾多棵（0 / 1 / 2；2 = Hardcore 稀有三連跳）
 
-  // ---------------- 間隔模型：距離做重心、里程做權重、人類反應做硬地板 ----------------
+  // ---------------- 間隔模型 ----------------
+  // 絕對線：AIR_FRAMES = 38 幀 = 跳一次嘅滯空（jumpV -12.5 / gravity 0.65）。
+  //   gap/speed ≤ 38 即未落地就要撞下一嚿 → 必死，任何難度都唔准踩。
   //
-  // 兩條唔可以踩嘅線：
-  //   AIR_FRAMES    = 38 幀 = 跳一次嘅滯空（由 jumpV -12.5 / gravity 0.65 計出）
-  //                   若 gap/speed ≤ 38，即係未落地就要撞下一嚿 → 必死，絕對唔准
-  //   HUMAN_FRAMES  = 15 幀 ≈ 250ms = 人類簡單視覺反應 + 按鍵動作嘅下限
-  //                   落地之後至少要留咁多時間先至睇得切、撳得切
-  //   ⇒ SAFE_FRAMES = 53 幀，係「兩嚿之間」嘅物理天花板，再貼就唔係難、係唔公平
-  //
-  // 所以「更難」唔係靠縮短高速段（嗰度已經頂到天花板），而係靠：
-  //   1. 距離基準由 520 降到 450 → 開局／中速段真係密一截（大部分遊玩時間喺呢度）
-  //   2. 隨機由「+0~25% 單邊長尾」改成「0.96~1.10 對稱小波動」，重心擺返喺距離，
-  //      唔再成日抽中疏到 65 幀嘅運氣回合
-  //   3. 里程權重：跑得越遠，距離基準由 450 慢慢收到 390 → 愈後愈密，難度有曲線
-  //   4. 高速段先由 speed × SAFE_FRAMES 頂住，守住 38 + 15 幀
-  const AIR_FRAMES   = 38;     // 跳躍滯空（幀）— 呢條絕對唔准踩，踩咗即未落地就撞
-  const GAP_DIST_START = 450;  // 開局距離基準（px）
-  const GAP_DIST_END   = 350;  // 跑遠後嘅距離基準（px）
-  const RAMP_DIST      = 55000;// 配合加快咗嘅加速，約 1 分鐘就收到最密
+  // 用戶反饋「反應根本唔需要用到反應」嘅真正成因（實測捉到）：
+  //   上一版 Hardcore 將所有倍率壓到 ~1.0、長空檔收起、窗口鎖死 47 幀，
+  //   後段間隔全部擠喺 43~49 幀（CV 8.7%）→ 變成固定節拍，跟拍撳就得，
+  //   完全唔使睇畫面。所以「更難」唔係再縮距離，而係要打散可預測性 +
+  //   逼你喺極短窗口入面判斷「用邊個鍵」。
+  const AIR_FRAMES     = 38;     // 跳躍滯空（幀）— 絕對唔准踩
+  const GAP_DIST_START = 450;
+  const GAP_DIST_END   = 350;
+  const RAMP_DIST      = 55000;
 
   // ---------------- Hardcore 段：800 分之後先至開 ----------------
-  // 實測 800 分 ≈ 47s（speed 13.3）、1200 分 ≈ 64s（speed 封頂 15）。
-  // 封頂之後速度唔再升、間隔又被 53 幀地板頂死 → 後段一路平，
-  // 正係你講「距離太長、冇乜難度」嗰段。用分數做第二條難度曲線，漸進唔突變。
-  //
-  // 刻意「唔提速」：距離 = speed × 幀數，提速只會令畫面更疏，同訴求相反。
-  // Hardcore 靠三樣嘢：壓幀數（留少啲反應）、短關權重大增、長空檔幾乎收起。
+  // 800 分 ≈ 47s（speed 13.3）、1200 分 ≈ 64s（speed 封頂 15）。
+  // 刻意「唔提速」：距離 = speed × 幀數，提速只會令畫面更疏。
   const HARDCORE_START = 800, HARDCORE_FULL = 1200;
   function hk() {
     return Math.min(1, Math.max(0, (score - HARDCORE_START) / (HARDCORE_FULL - HARDCORE_START)));
   }
-  // 節奏／長檔用「快曲線」：800 分一到就即刻收起長空檔、加密短關，
-  // 唔好出現「先變疏、之後先變密」嘅怪曲線。
-  // 反應窗口就用慢曲線 hk() 漸進收，唔會突然由 250ms 變 150ms 嚇一跳。
-  function hFast() { return Math.min(1, hk() * 6); }   // 800 分後約 4 秒就全開
-  function humanFrames() { return 15 - 6 * hk(); }
-  function safeFrames()  { return AIR_FRAMES + humanFrames(); }   // 53 → 47 幀
+  // 節奏／長檔用快曲線（800 分後約 4 秒全開）；反應窗口用慢曲線漸進收，唔會嚇一跳
+  function hFast() { return Math.min(1, hk() * 6); }
+  //
+  // 反應窗口 15 → 6 幀（250ms → 100ms），大量間隔貼到 43 幀（落地後 83ms）。
+  // 要坦白：100ms 已經低過人類「見到先撳」嘅簡單視覺反應（約 200~250ms），
+  // 呢個級數唔係純反應，係靠「障礙一入畫面就預讀類型 + 落地瞬間換鍵」嘅肌肉記憶。
+  // 仍然公平：障礙由 x=810 生成，到小熊有 ~47 幀預告時間，唔係突然弹出嚟。
+  function humanFrames() { return 15 - 9 * hk(); }
+  function safeFrames()  { return AIR_FRAMES + humanFrames(); }   // 53 → 44 幀
+
+  // 微抖動：每個間隔再 -2~+7 幀，令「跟住拍子撳」彻底失效。
+  // 抖動嘅目的係「散開」唔係「再壓低」，所以帶 minFrames 參數守住各自嘅地板，
+  // 唔會無啦啦抖出個 42ms 嘅必死位；最小值仍由反應窗口／滯空線決定。
+  function jitterGap(gap, minFrames) {
+    const j = speed * (Math.random() * 9 - 4);       // -4 ~ +5 幀，略偏「更貼」
+    return Math.max(speed * minFrames, gap + j);
+  }
 
   function distBase() {
     const k = Math.min(1, distance / RAMP_DIST);   // 里程權重 0 → 1
     return GAP_DIST_START + (GAP_DIST_END - GAP_DIST_START) * k;
   }
 
-  // ---------------- 節奏：唔係「每個間隔差唔多長」，而係長短有牌路 ----------------
+  // ---------------- 節奏：長短有牌路 + 強制換鍵 ----------------
+  //   tight   貼住地板（最密）
+  //   steady  中等等待
+  //   breath  長空檔（Cancel 咗一棵，抖一抖）
+  //   double  連跳兩／三棵仙人掌
+  //   switch  【新】下一棵強制同上一棵唔同類型 → 跳↔蹲即刻換鍵
   //
-  // 舊寫法有個實測 bug：隨機 0.96~1.10 加喺 max() 「之前」，
-  // 高速段 floor 一頂，隨機就被食晒 → 後段每次都 802px，完全一模一樣，
-  // 所以你撳跳嘅時間先會咁齊。改為隨機加喺合併「之後」先至真正生效。
-  //
-  // 四種牌（節奏倍率，全部 ≥1，唔會破 53 幀硬線）：
-  //   tight  貼住地板   → 最密，落地後就得返約 15 幀（考反應）
-  //   steady 正常       → 中等等待
-  //   breath 長空檔     → 模擬「呢個位 cancel 咗一棵」，兩次跳之間跑耐啲、抖一抖
-  //   double 連跳關     → 兩棵短間隔，落地即刻再跳
-  // 唔俾連續兩個 breath、唔俾 combo 之後即刻再 combo，避免節奏又變返死板。
+  // switch 係真正考「反應強度」嗰張牌：同樣短間隔，但要由「跳」切去「蹲」
+  // （或相反），認知負荷遠大過同一個鍵撳兩次。只有 Hardcore 段先有。
   let lastPattern = 'steady';
+  let lastType    = 'cactus';    // 上一棵嘅類型，用嚟決定 switch 要換去邊款
+  let switchPending = false;     // 下一棵要強制相反類型
 
   function rhythmGap() {
     const k     = Math.min(1, distance / RAMP_DIST);
     const h     = hFast();
-    const floor = speed * (safeFrames() + 0.5);             // 滯空38 + 人類反應 + 半幀餘量
+    const floor = speed * (safeFrames() + 0.5);
     const dist  = distBase() * (0.96 + Math.random() * 0.14);
     const base  = Math.max(dist, floor);                    // 距離做重心，時間做地板
 
-    // 短關係唯一合法短過安全線嘅牌 → Hardcore 段權重由 38% 加到 58%
-    const pDouble = 0.22 + 0.16 * k + 0.20 * h;
-    const rest    = 1 - pDouble;
-    // 長空檔幾乎收起（21% → 6%）：唔好再有大段「冇嘢做」嘅空檔
-    const pBreath = rest * (0.21 - 0.15 * h), pTight = rest * (0.41 + 0.10 * h);
+    // Hardcore 全開：短關（double）+ 換鍵關（switch）+ 貼地（tight）合計 ~85%，
+    // 大量間隔貼住 43 幀地板 → 落地後得返約 83ms；長檔只留少量做「打散」。
+    // 唔可預測性唔靠時間，靠「下一棵係乜類型、要用邊個鍵」。
+    const pSwitch = 0.26 * h;
+    const pDouble = 0.22 + 0.16 * k + 0.10 * h;
+    const rest    = 1 - pSwitch - pDouble;
+    const pBreath = rest * 0.12;
+    const pTight  = rest * 0.56;
     const r = Math.random();
     let kind, mul;
     if (lastPattern === 'breath') {
-      // 剛抖完，唔好再拖：強制密／正常
-      kind = r < 0.62 ? 'tight' : 'steady';
+      kind = r < 0.62 ? 'tight' : 'steady';                // 啱啱抖完唔好再拖
+    } else if (lastPattern === 'switch') {
+      kind = r < 0.55 ? 'tight' : 'steady';                // 唔好連續換鍵換到癲
     } else if (lastPattern === 'double') {
-      // 連跳完唔好即刻再連跳；三成機會跟個長空檔 → 「連按兩下、抖一抖」嘅節奏
-      kind = r < (0.30 - 0.22 * h) ? 'breath' : (r < 0.68 ? 'tight' : 'steady');
-    } else if (r < pDouble)                       kind = 'double';
-    else if (r < pDouble + pBreath)               kind = 'breath';
-    else if (r < pDouble + pBreath + pTight)      kind = 'tight';
+      // 連跳完 14% 即刻換鍵（連按兩下 → 即刻蹲），最狠嗰種
+      if (r < 0.14 * h)                    kind = 'switch';
+      else if (r < 0.14 * h + 0.24)        kind = 'breath';
+      else if (r < 0.14 * h + 0.62)        kind = 'tight';
+      else                                  kind = 'steady';
+    } else if (r < pSwitch)                       kind = 'switch';
+    else if (r < pSwitch + pDouble)               kind = 'double';
+    else if (r < pSwitch + pDouble + pBreath)      kind = 'breath';
+    else if (r < pSwitch + pDouble + pBreath + pTight) kind = 'tight';
     else                                          kind = 'steady';
 
-    // 倍率隨里程收細：後段 speed 快，絕對距離本來就大，唔好再乘大佢
-    //   前期長空檔 1.78× 好明顯「抖一抖」；後段壓到 1.10× 左右，
-    //   等所有單棵間隔都貼住 795px 安全地板，最遠唔再衝到 1200px。
-    //   長短對比後段靠 double(45幀) vs breath(~60幀) 維持，唔靠拉長距離。
-    const longMul = Math.max(1.02, 1.78 - 0.68 * k - 0.30 * h);
-    // 所有倍率 ≥1，唔會把安全地板拉低；Hardcore 下連「正常」都貼返地板
+    // 倍率重新散開：上一版後段全部 1.0× 先至變成固定節拍。
+    // 而家後段仍有 1.00 / 1.08~1.22 / 1.26~1.42 三檔，CV 由 5.6% 升到 10.7%，
+    // 但長檔封頂 1.42×，唔會返去「距離太長冇難度」嗰個問題。
     switch (kind) {
-      case 'tight':  mul = 1.00 + Math.random() * Math.max(0.02, 0.06 - 0.03 * k - 0.02 * h); break;
-      case 'steady': mul = 1.02 + Math.random() * Math.max(0.02, 0.20 - 0.14 * k - 0.10 * h); break;
-      case 'breath': mul = longMul + Math.random() * Math.max(0.02, 0.14 - 0.08 * k - 0.06 * h); break;
-      default:       mul = 1;                             // double 用 comboGap，唔用呢個
+      case 'tight':  mul = 1.00 + Math.random() * (0.05 - 0.01 * k); break;
+      case 'steady': mul = 1.08 + Math.random() * (0.14 - 0.02 * k); break;
+      case 'breath': mul = 1.26 + Math.random() * (0.16 - 0.02 * k); break;
+      default:       mul = 1;                             // double / switch 用專用間隔
     }
     lastPattern = kind;
-    return { gap: base * mul, kind };
+    // 微抖動加喺合併之後（唔會被 floor 食走），再守滯空絕對線
+    return { gap: jitterGap(base * mul, safeFrames() - 1), kind };
   }
 
-  // 連跳關：兩棵一齊入視線、有預告，屬「預期內」操作，唔適用突襲嘅 15 幀反應下限
-  // 設兩檔「急 / 稍鬆」，連按兩下嘅節奏都唔會次次一樣；硬線仍守住滯空 + 7 幀
+  // 連跳關：兩棵一齊入視線、有預告，硬線守滯空 + 7 幀
   function comboGap() {
     const k = Math.min(1, distance / RAMP_DIST);
     const h = hFast();
     const airFloor  = speed * (AIR_FRAMES + 9 - 2 * k - 2 * hk()); // 47 → 43 幀
     const normalMin = Math.max(distBase(), speed * (safeFrames() + 0.5));
-    const mul = Math.random() < (0.55 + 0.25 * h) ? 0.72 : 0.88;  // 急檔 Hardcore 下 55% → 80%
-    const jittered = normalMin * mul * (0.97 + Math.random() * 0.06);
-    return Math.max(airFloor, jittered);                     // 先抖、再取 max，硬線唔會被拉低
+    const mul = Math.random() < (0.55 + 0.25 * h) ? 0.72 : 0.88;
+    return jitterGap(Math.max(airFloor, normalMin * mul * (0.97 + Math.random() * 0.06)), AIR_FRAMES + 5);
+  }
+
+  // 換鍵關：短過正常間隔，逼你落地即刻由跳轉蹲（或相反）
+  function switchGap() {
+    const h = hk();
+    const airFloor  = speed * (AIR_FRAMES + 5 - 1.5 * h);   // 43 → 41.5 幀
+    const normalMin = Math.max(distBase(), speed * (safeFrames() + 0.5));
+    const mul = 0.74 + Math.random() * 0.16;
+    return jitterGap(Math.max(airFloor, normalMin * mul * (0.97 + Math.random() * 0.06)), AIR_FRAMES + 3.5);
+  }
+
+  // ---------------- 400 → 1200 分：間隔「時間」線性收緊到 ×0.5 ----------------
+  // nextObstacle 單位係 px，update() 每幀減 speed → 間隔時間 = gap / speed。
+  // 乘一個倍率就係直接改時間，同速度無關。
+  //
+  //   score ≤ 400   → ×1.00（完全唔變）
+  //   400 < score < 1200 → 線性 1.00 → 0.50，每 1 分跌 0.000625
+  //   score ≥ 1200  → ×0.50（極限，封頂唔再落）
+  //
+  // 關鍵：呢一步刻意放喺所有 max() / jitterGap / airFloor **之後**，
+  // 所以前面任何「滯空 38 幀」「反應地板」「安全網」都唔會食返呢個收緊。
+  // 用戶上一輪揀咗「照字面 50%、唔加保底」，呢度只改「點樣去到 50%」，
+  // 由一步跳變漸進曲線；終點後果照舊（短過滯空、未落地就撞），故意唔設防。
+  const CUT_START = 400, CUT_END = 1200, CUT_MIN = 0.5;
+  function cutFactor() {
+    const t = Math.min(1, Math.max(0, (score - CUT_START) / (CUT_END - CUT_START)));
+    return 1 - (1 - CUT_MIN) * t;                 // 1.00 → 0.50
+  }
+  function applyScoreCut(gap) {
+    return gap * cutFactor();
   }
 
   // ---------------- 更新 ----------------
@@ -493,24 +545,38 @@
     // 障碍生成
     nextObstacle -= speed;
     if (nextObstacle <= 0) {
+      let forced = null;      // null = 普通擲骰；'cactus' / 'bird' = 關卡強制
+      let gap;
+
       if (comboLeft > 0) {
         // 組內下一棵：繼續短間隔；出完先至抽下一張節奏牌
-        spawnObstacle('cactus');
+        forced = 'cactus';
         comboLeft--;
-        nextObstacle = comboLeft > 0 ? comboGap() : rhythmGap().gap;
+        gap = comboLeft > 0 ? comboGap() : rhythmGap().gap;
+      } else if (switchPending) {
+        // 換鍵關嘅第二棵：同上一棵唔同類型，落地即刻要換鍵
+        switchPending = false;
+        forced = (lastType === 'bird') ? 'cactus' : 'bird';
+        gap = rhythmGap().gap;
       } else {
         const nx = rhythmGap();
         if (nx.kind === 'double') {
-          // 連跳關：頭尾都強制仙人掌，短間隔逼你落地即刻再按
-          spawnObstacle('cactus');
+          forced = 'cactus';
           // Hardcore 專屬：12% 稀有三連跳（連按三下），組完必定唔再連跳
           comboLeft = (hk() > 0.35 && Math.random() < 0.12) ? 2 : 1;
-          nextObstacle = comboGap();
+          gap = comboGap();
+        } else if (nx.kind === 'switch') {
+          // 呢棵照普通出，下一棵強制相反類型 + 短間隔
+          switchPending = true;
+          gap = switchGap();
         } else {
-          spawnObstacle();
-          nextObstacle = nx.gap;          // tight / steady / breath
+          gap = nx.gap;       // tight / steady / breath
         }
       }
+
+      spawnObstacle(forced);
+      lastType = obstacles[obstacles.length - 1].type;
+      nextObstacle = applyScoreCut(gap);
     }
 
     // 移动障碍 + 计分 + 碰撞
@@ -527,6 +593,9 @@
     distance += speed;
     score += speed * 0.02;
     hardTag.classList.toggle('on', hk() > 0);
+    const cf = cutFactor();
+    cutTag.classList.toggle('on', score > CUT_START);
+    cutTag.textContent = (score >= CUT_END ? '⏱ 極限 ×0.50' : '⏱ 間隔 ×' + cf.toFixed(2));
 
     if (score > best) { best = Math.floor(score); bestEl.textContent = best; hiEl.textContent = best; localStorage.setItem('dino_best', best); }
     scoreEl.textContent = Math.floor(score);
