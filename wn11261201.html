@@ -211,6 +211,29 @@
   .poi .tag { color: #6f7d74; font-weight: 600; white-space: nowrap; }
   .poi .txt { border-bottom: 1px dashed #e6ebe7; }
   .poi .copy, .poi .doc, .poi .app { font-size: 9.5px; padding: 1px 8px; }
+
+  /* 一日自駕時序：最次要，時間欄對齊 */
+  .timeline {
+    margin: 8px 0;
+    padding: 9px 11px;
+    background: #f7f9f6;
+    border: 1px solid #e5ede3;
+    border-left: 3px solid #7a9c6b;
+    border-radius: 10px;
+    font-size: 11.5px;
+    line-height: 1.7;
+    color: #6f7d74;
+  }
+  .timeline .ttl { font-size: 12px; font-weight: 700; color: #4a6b3a; margin-bottom: 5px; }
+  .timeline .row { display: flex; gap: 8px; }
+  .timeline .t {
+    flex: 0 0 40px;
+    color: #2e7d32;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .timeline .p { flex: 1; min-width: 0; }
+  .timeline .p small { color: #a3afa8; }
 </style>
 </head>
 <body>
@@ -278,6 +301,15 @@
       <span class="st">🚗 大理站取車 10:30</span>　<span class="pill ok">已訂</span>　商家送車到站<br>
       <span class="note">五菱繽果（純電 · 4座 · 續航203–410km）· 11/27 10:30 → 11/30 17:30 · 3天7小時 · ¥564（已減¥92）· 不限里程 · 押金¥3000免收</span><br>
       <span class="chk">✓ 10:09 到站 → 10:30 取車，時間啱；11/27 10:30前可免費取消</span>
+    </div>
+    <div class="timeline">
+      <div class="ttl">🚗 取車後 · 環洱海自駕時序</div>
+      <div class="row"><span class="t">11:30</span><span class="p">喜洲古鎮 <small>（千年銀杏、轉角樓、午餐）</small></span></div>
+      <div class="row"><span class="t">14:00</span><span class="p">雙廊古鎮 <small>（銀杏大道、玉幾島）</small></span></div>
+      <div class="row"><span class="t">15:30</span><span class="p">鹿臥山「洱海之窗」 <small>（懸崖海景，30分）</small></span></div>
+      <div class="row"><span class="t">16:30</span><span class="p">小普陀＋挖色碼頭 <small>（餵海鷗、森系棧道，1h）</small></span></div>
+      <div class="row"><span class="t">17:30</span><span class="p">入住文筆村</span></div>
+      <div class="row"><span class="t">18:28</span><span class="p">高坡睇日落 <small>→ 19:00後睇漁燈</small></span></div>
     </div>
   </div>
 </div>
